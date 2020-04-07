@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const UsersSchema = require('./schemas/user');
+const { UsersSchema } = require('./schemas/user');
 const { logDatabase } = require('../utils/logger');
 const helpers = require('../helpers/models/user');
 

@@ -7,6 +7,11 @@ const validatorCPF = require('cpf-cnpj-validator').cpf;
 const { Schema } = mongoose;
 const { validateCPF, messages } = require('../../utils/validators');
 
+const userRoles = {
+  ADMIN: 'admin',
+  USER: 'user',
+};
+
 const UsersSchema = new Schema({
   name: {
     type: String,
@@ -36,7 +41,7 @@ const UsersSchema = new Schema({
       return this.password != null;
     },
   },
-  role: { type: String, default: 'user' },
+  role: { type: String, default: userRoles.USER },
 });
 
 // CPF Getters & Setters
@@ -54,4 +59,7 @@ UsersSchema.plugin(beautifyUnique, {
   defaultMessage: messages.schemas.unique,
 });
 
-module.exports = UsersSchema;
+module.exports = {
+  UsersSchema,
+  userRoles,
+};

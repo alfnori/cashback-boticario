@@ -4,25 +4,28 @@ const { isEmptyObject } = require('../utils/checker');
 const { parseJSON, sanitize } = require('../utils/transformer');
 const { logRequest } = require('../utils/logger');
 const { validatorCPF, validateCode } = require('../utils/validators');
-const { statusTags } = require('../models/status');
+const { statusTags } = require('../models/schemas/status');
+const { userRoles } = require('../models/schemas/user');
 
 const defaultLimit = 100;
 const defaultSkip = 0;
 const defaultPage = 1;
 const minSearchLength = 3;
 
-const sanitizeCpf = (value, { req }) => {
+const sanitizeCpf = (value, { req }, defaultToToken = true) => {
   const tokenCPF = req.user.cpf;
-  const cpf = value || tokenCPF;
+  const cpf = value || (defaultToToken ? tokenCPF : null);
   if (cpf && validatorCPF.isValid(cpf)) {
     return validatorCPF.strip(cpf);
   }
   return null;
 };
 
-const assertMatchCPF = (value, { req }) => {
-  if (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
-    throw new Error('Informed CPF doesn\'t match with one in user token.');
+const assertMatchCPF = (value, { req }, optional = false) => {
+  if (!optional && (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf))) {
+    if (req.user.role !== userRoles.ADMIN) {
+      throw new Error('Informed CPF doesn\'t match with one in user token.');
+    }
   }
   return true;
 };
@@ -40,7 +43,9 @@ const getAllIsValid = (req, res, next) => {
 };
 
 const getAllValidator = () => [
-  param('cpf').trim().customSanitizer(sanitizeCpf).optional(),
+  query('cpf').optional()
+    .customSanitizer((value, options) => sanitizeCpf(value, options))
+    .custom((value, options) => assertMatchCPF(value, options)),
   query('filter').optional().isJSON(),
   query('search').optional().trim().isLength({ min: minSearchLength }),
   query('sort')

@@ -8,6 +8,7 @@ const envs = {
   VALIDATE_CPF: 'VALIDATE_CPF',
   DEBUG_TAG: 'DEBUG_TAG',
   STRONG_PASSWORD: 'STRONG_PASSWORD',
+  SPECIAL_CPF: 'SPECIAL_CPF',
 };
 
 const get = (envTag, defaultValue = null) => process.env[envTag] || defaultValue;
