@@ -4,7 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 const { logError } = require('../utils/logger');
-const jwtMiddleware = require('../middlewares/jwt');
+const jwtMiddleware = require('./jwt');
 
 const criticalError = (err, req, res, next) => {
   // Log error message in our server's console
@@ -28,7 +28,8 @@ const invalidToken = (err, req, res, next) => {
 };
 
 const init = (app) => {
-  app.use(morgan('tiny', { skip(req, res) { return res.statusCode < 400; } }));
+  app.use(morgan('combined', { skip(req, res) { return res.statusCode < 400; } }));
+  app.use(morgan('tiny', { skip(req, res) { return res.statusCode > 400; } }));
   app.use(bodyParser.json());
   app.use(cors());
   app.use((req, res, next) => {

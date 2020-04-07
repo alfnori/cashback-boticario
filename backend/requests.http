@@ -1,69 +1,61 @@
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTE4MTVhNmU1YzU2ZTA4NTYzMzY5NGYiLCJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIxNjY0NDIyOTkzMyIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjEyNDE3NCwiZXhwIjoxNjE3NjgxNzc0fQ.-L8OQC3i9Hhh4L2j0f32EV-V8sUA60RFY7zKpXGAU08
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjI3NTYwOCwiZXhwIjoxNjE3ODMzMjA4fQ.tC8gwCTEsjr7vSw_zzFq4XwlKCPJhyflljxuzM9-GBg
+
+
+#### STATUS
 
 ### Get status list
 GET http://localhost:8089/api/status/
 Authorization: Bearer {{token}} 
 
-### Get employee list
-GET http://localhost:8089/api/employee?sortx={"name":"asc"}&filter={"email":"alfnori"}
+### Get status by tag
+GET http://localhost:8089/api/status/tag/EV
 Authorization: Bearer {{token}} 
 
-### Get one employee
-GET http://localhost:8089/api/employee/5e17a4f5034c4b01a6ce749d
+
+#### PURCHASES
+
+### Get purchases list
+GET http://localhost:8089/api/purchases?sort={"date":"desc"}&filter={"code": "560"}
 Authorization: Bearer {{token}} 
 
-### Create employee
-POST http://localhost:8089/api/employee/create HTTP/1.1
+### Get purchases list by cpf
+GET http://localhost:8089/api/purchases/cpf?sort={"date":"desc"}&filter={}
+Authorization: Bearer {{token}} 
+
+### Get one purchases
+GET http://localhost:8089/api/purchases/5e17a4f5034c4b01a6ce749d
+Authorization: Bearer {{token}} 
+
+### Create purchases
+POST http://localhost:8089/api/purchases/create
+Authorization: Bearer {{token}} 
 content-type: application/json
-Authorization: Bearer {{token}} 
 
 {
-    "name": "Adolfo Luiz 2",
-    "document": "066.402.209-05",
-    "birthDate": "1988-02-14T03:00:00.000Z",
-    "phoneNumber": "41988730745",
-    "email": {
-      "work": "alfnori@gmail.com",
-      "personal": "alfnori@gmail.com"
-    },
-    "employmentStatus" : "5e1517ee65ccfefe983ba0c5",
-    "employmentStatusObservation" : "Aguardando validação deste teste.",
-    "department": "5e1517ee65ccfef1263ba0c4",
-    "designation": "Full-Stack Developer",
-    //"salary": 3333.33,
-    //"resignationDate": "2020-01-01T03:00:00.000Z",
-    "admissionDate": "2020-01-01T03:00:00.000Z"
+    "code": "ABC1234560",
+    "cpf": "065.909.710-99",
+    "date": "2020-04-04T03:00:00.000Z",
+    "value": 3333.33
 }
 
-### Update employee
-PUT http://localhost:8089/api/employee/update/5e17a4f5034c4b01a6ce749d HTTP/1.1
-content-type: application/json
+### Update purchases
+PUT http://localhost:8089/api/purchases/update/5e8c944e90e748004194b904 HTTP/1.1
 Authorization: Bearer {{token}} 
+content-type: application/json
 
 {
-    "name": "Adolfo Luiz",
-    "birthDate": "1988-02-14T03:00:00.000Z",
-    "phoneNumber": "41988730745",
-    "email": {
-      "work": "alfnori@gmail.com",
-      "personal": "alfnori@gmail.com"
-    },
-    "employmentStatus" : "5e178ff62c6b222294668e7f",
-    "employmentStatusObservation": "Aguardando validação",
-    "department": "5e178ff52c6b228028668e7e",
-    "designation": "Full-Stack Developer",
-    "salary": 3333.33,
-    "admissionDate": "2020-02-01T03:00:00.000Z",
-    "resignationDate": null,
-    "document": "066.402.209-03"
+    "code": "ABC1234560",
+    "cpf": "50510242200",
+    "date": "2020-04-04T03:00:00.000Z",
+    "value": 5555.55
 }
 
-### Delete employee
-DELETE http://localhost:8089/api/employee/delete/5e17e0de2fc30704eaf2d001
+### Delete purchases
+DELETE http://localhost:8089/api/purchases/delete/5e17e0de2fc30704eaf2d001
 Authorization: Bearer {{token}} 
 
 
-#### USER REQUEST
+#### USERS
 
 ### Get user from token
 GET http://localhost:8089/api/user/current
@@ -75,8 +67,8 @@ content-type: application/json
 
 {
     "name": "Adolfo Luiz",
-    "email": "alfnori2@gmail.com",
-    "cpf": "25634428777",
+    "email": "alfnori@gmail.com",
+    "cpf": "50510242200",
     "password": "S3crt3t$",
     "passwordConfirm": "S3crt3t$"
 }

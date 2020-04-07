@@ -1,26 +1,29 @@
 const mongoose = require('mongoose');
 const typeEmail = require('mongoose-type-email');
-
-const { Schema } = mongoose;
-
 const beautifyUnique = require('mongoose-beautiful-unique-validation');
 const timestamps = require('mongoose-timestamp');
+const validatorCPF = require('cpf-cnpj-validator').cpf;
 
-const nonUniqueMessage = '{VALUE} already exists.';
+const { Schema } = mongoose;
 const { validateCPF, messages } = require('../../utils/validators');
 
 const UsersSchema = new Schema({
-  name: { type: String, required: true },
+  name: {
+    type: String,
+    required: true,
+  },
   email: {
     type: typeEmail,
     lowercase: true,
     required: true,
     unique: true,
+    index: true,
   },
   cpf: {
     type: String,
     required: true,
     unique: true,
+    index: true,
     validate: {
       validator: validateCPF,
       message: messages.cpf.default,
@@ -36,13 +39,19 @@ const UsersSchema = new Schema({
   role: { type: String, default: 'user' },
 });
 
+// CPF Getters & Setters
+UsersSchema.path('cpf').get((cpf) => validatorCPF.format(cpf));
+UsersSchema.path('cpf').set((cpf) => validatorCPF.strip(cpf));
+
+// Indexes
 UsersSchema.index({ name: 1, email: 1, cpf: 1 });
 UsersSchema.index({ email: 1 }, { unique: true });
 UsersSchema.index({ cpf: 1 }, { unique: true });
 
+// Plugins
 UsersSchema.plugin(timestamps);
 UsersSchema.plugin(beautifyUnique, {
-  defaultMessage: nonUniqueMessage,
+  defaultMessage: messages.schemas.unique,
 });
 
 module.exports = UsersSchema;

@@ -1,7 +1,7 @@
 const unless = require('express-unless');
 const jwt = require('express-jwt');
 
-const User = require('../models/user');
+const UserSchema = require('../models/user');
 const { appSecretJWT } = require('../helpers/models/user');
 
 const { isEmptyObject } = require('../utils/checker');
@@ -16,8 +16,8 @@ const assertTokenFromHeader = (req) => {
 };
 
 const isRevokedCallback = (req, payload, done) => {
-  const { _id, email } = payload;
-  User.findOne({ _id, email }, (err, user) => {
+  const { cpf, email } = payload;
+  UserSchema.findOne({ cpf, email }, (err, user) => {
     if (err) { return done(err); }
     return done(null, isEmptyObject(user));
   });

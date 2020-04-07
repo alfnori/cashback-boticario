@@ -1,7 +1,7 @@
 const debug = require('debug');
 const e = require('./env');
 
-const DEBUG_TAG = (name) => `${(e.get(e.envs.DEBUG_TAG)).replace(':*', '')}:${name}`;
+const DEBUG_TAG = (name) => `${(e.get(e.envs.DEBUG_TAG, 'DEBUG')).replace(':*', '')}:${name}`;
 
 const logger = debug(DEBUG_TAG('APP'));
 const logDatabase = debug(DEBUG_TAG('MONGO'));
