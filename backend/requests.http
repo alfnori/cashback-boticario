@@ -2,6 +2,8 @@
 @specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3BlY2lhbCBVc2VyIiwiY3BmIjoiMTUzLjUwOS40NjAtNTYiLCJlbWFpbCI6InNwZWNpYWxAdXNlci5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1ODYyODU5OTgsImV4cCI6MTYxNzg0MzU5OH0.I262JcLPjPtClw5l1GeydEqMV01STwAaeWC-Mp0TjP4
 
 @host=http://localhost:8089
+@myCPF=065.909.710-99
+@specialCPF=153.509.460-56
 
 #### STATUS
 
@@ -17,25 +19,25 @@ Authorization: Bearer {{token}}
 #### PURCHASES
 
 ### Get purchases list
-GET {{host}}/api/purchases?sort={"date":"desc"}&filter={"code": "ABC"}
-Authorization: Bearer {{token}} 
+GET {{host}}/api/purchases?sort={"date":"desc"}&filter={"code": "ABC"}&sxearch=056
+Authorization: Bearer {{specialToken}} 
 
 ### Get purchases list by cpf
-GET {{host}}/api/purchases/cpf/15350946056?sort={"date":"desc"}
+GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}} 
 
 ### Get one purchases
-GET {{host}}/api/purchases/5e17a4f5034c4b01a6ce749d
-Authorization: Bearer {{token}} 
+GET {{host}}/api/purchases/5e8cc85f1e15c0028f4fb490
+Authorization: Bearer {{token}}
 
 ### Create purchases
 POST {{host}}/api/purchases/create
-Authorization: Bearer {{token}} 
+Authorization: Bearer {{specialToken}} 
 content-type: application/json
 
 {
     "code": "ABC1234000",
-    "cpf": "153.509.460-56",
+    "cpf": "{{myCPF}}",
     "date": "2020-04-04T03:00:00.000Z",
     "value": 3333.33
 }

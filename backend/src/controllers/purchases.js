@@ -4,9 +4,9 @@ const { jsonResponse, errorResponse } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const { envs, get } = require('../utils/env');
 const { validatorCPF } = require('../utils/validators');
-const Purchases = require('../models/purchases');
 const { statusTags } = require('../models/schemas/status');
 const { userRoles } = require('../models/schemas/user');
+const Purchases = require('../models/purchases');
 const Status = require('../models/status');
 
 controller.getAllPurchases = (req, res) => {
@@ -28,8 +28,26 @@ controller.getAllPurchasesByCPF = (req, res) => {
 };
 
 controller.getOnePurchases = (req, res) => {
-  Purchases.getOnePurchases(req.params.id,
-    (error, purchases) => jsonResponse(error, { purchases }, res));
+  const { id } = req.params;
+  const { cpf, role } = req.user;
+  Purchases.getOnePurchases(id,
+    (error, purchase) => {
+      if (error) {
+        errorResponse(error, res);
+      } else {
+        let userPurchase = purchase;
+        if (userPurchase && userPurchase.cpf) {
+          if (role !== userRoles.ADMIN) {
+            const purchaseCPF = validatorCPF.strip(purchase.cpf);
+            const userCPF = validatorCPF.strip(cpf);
+            if (purchaseCPF !== userCPF) {
+              userPurchase = null;
+            }
+          }
+        }
+        jsonResponse(null, { purchase: userPurchase }, res);
+      }
+    });
 };
 
 controller.createPurchases = (req, res) => {

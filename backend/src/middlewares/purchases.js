@@ -12,8 +12,9 @@ const defaultSkip = 0;
 const defaultPage = 1;
 const minSearchLength = 3;
 
-const sanitizeCpf = (value, { req }, defaultToToken = true) => {
+const sanitizeCpf = (value, { req }) => {
   const tokenCPF = req.user.cpf;
+  const defaultToToken = req.user.role === userRoles.USER;
   const cpf = value || (defaultToToken ? tokenCPF : null);
   if (cpf && validatorCPF.isValid(cpf)) {
     return validatorCPF.strip(cpf);
@@ -21,11 +22,10 @@ const sanitizeCpf = (value, { req }, defaultToToken = true) => {
   return null;
 };
 
-const assertMatchCPF = (value, { req }, optional = false) => {
-  if (!optional && (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf))) {
-    if (req.user.role !== userRoles.ADMIN) {
-      throw new Error('Informed CPF doesn\'t match with one in user token.');
-    }
+const assertMatchCPF = (value, { req }) => {
+  const skipValidation = req.user.role === userRoles.ADMIN;
+  if (!skipValidation && validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
+    throw new Error("Informed CPF doesn't match with one in user token.");
   }
   return true;
 };
@@ -42,10 +42,11 @@ const getAllIsValid = (req, res, next) => {
   return validateRequest(req, res, next);
 };
 
-const getAllValidator = () => [
-  query('cpf').optional()
-    .customSanitizer((value, options) => sanitizeCpf(value, options))
-    .custom((value, options) => assertMatchCPF(value, options)),
+const getAllValidator = (skipCPFOnQuery = false) => [
+  query('cpf')
+    .trim()
+    .customSanitizer(sanitizeCpf)
+    .custom((v, o) => (skipCPFOnQuery ? true : assertMatchCPF(v, o))),
   query('filter').optional().isJSON(),
   query('search').optional().trim().isLength({ min: minSearchLength }),
   query('sort')

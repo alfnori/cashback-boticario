@@ -18,7 +18,7 @@ purchasesRouter.get('/',
 purchasesRouter.get('/cpf/:cpf',
   middleware.cpfValidator(),
   middleware.cpfIsValid,
-  middleware.getAllValidator(),
+  middleware.getAllValidator(true),
   middleware.getAllIsValid,
   (req, res) => {
     logRequest('GET ALL PURCHASES BY CPF');

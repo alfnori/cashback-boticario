@@ -1,5 +1,4 @@
 const express = require('express');
-
 const database = require('./models/mongoose');
 const router = require('./routes');
 const middleware = require('./middlewares');

@@ -4,7 +4,9 @@ const beautifyUnique = require('mongoose-beautiful-unique-validation');
 
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Schema.Types;
-const { validateCPF, validateCode, messages } = require('../../utils/validators');
+const {
+  validatorCPF, validateCPF, validateCode, messages,
+} = require('../../utils/validators');
 
 const PurchasesSchema = new Schema({
   code: {
@@ -40,6 +42,10 @@ const PurchasesSchema = new Schema({
     ref: 'Status',
   },
 });
+
+// CPF Getters & Setters
+PurchasesSchema.path('cpf').get((cpf) => validatorCPF.format(cpf));
+PurchasesSchema.path('cpf').set((cpf) => validatorCPF.strip(cpf));
 
 PurchasesSchema.index({ cpf: 1, date: 1, status: 1 });
 PurchasesSchema.index({ code: 1 }, { unique: true });
