@@ -27,8 +27,8 @@ GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}} 
 
 ### Get one purchases
-GET {{host}}/api/purchases/5e8cc85f1e15c0028f4fb490
-Authorization: Bearer {{token}}
+GET {{host}}/api/purchases/5e8cd2f672778d0336c75cf1
+Authorization: Bearer {{specialToken}}
 
 ### Create purchases
 POST {{host}}/api/purchases/create
@@ -55,8 +55,8 @@ content-type: application/json
 }
 
 ### Delete purchases
-DELETE {{host}}/api/purchases/delete/5e17e0de2fc30704eaf2d001
-Authorization: Bearer {{token}} 
+DELETE {{host}}/api/purchases/delete/xxxxxxxxxxx5e8cdcb720458b03a282d3e1
+Authorization: Bearer {{specialToken}} 
 
 
 #### USERS

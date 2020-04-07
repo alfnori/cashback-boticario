@@ -1,13 +1,11 @@
 const controller = {};
 
-const { jsonResponse, errorResponse } = require('../helpers/request');
+const helpers = require('../helpers/request/purchases');
+const { jsonResponse, errorResponse, assembleError } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
-const { envs, get } = require('../utils/env');
-const { validatorCPF } = require('../utils/validators');
-const { statusTags } = require('../models/schemas/status');
 const { userRoles } = require('../models/schemas/user');
+const { statusTags } = require('../models/schemas/status');
 const Purchases = require('../models/purchases');
-const Status = require('../models/status');
 
 controller.getAllPurchases = (req, res) => {
   const { cpf } = req.query;
@@ -35,16 +33,7 @@ controller.getOnePurchases = (req, res) => {
       if (error) {
         errorResponse(error, res);
       } else {
-        let userPurchase = purchase;
-        if (userPurchase && userPurchase.cpf) {
-          if (role !== userRoles.ADMIN) {
-            const purchaseCPF = validatorCPF.strip(purchase.cpf);
-            const userCPF = validatorCPF.strip(cpf);
-            if (purchaseCPF !== userCPF) {
-              userPurchase = null;
-            }
-          }
-        }
+        const userPurchase = helpers.validateUserPurchase(purchase, role, cpf);
         jsonResponse(null, { purchase: userPurchase }, res);
       }
     });
@@ -52,19 +41,10 @@ controller.getOnePurchases = (req, res) => {
 
 controller.createPurchases = (req, res) => {
   const { body } = req;
-  let newStatus = statusTags.EmValidacao;
-  if (body.cpf === validatorCPF.strip(get(envs.SPECIAL_CPF, '153.509.460-56'))) {
-    newStatus = statusTags.Aprovado;
-  }
-  Status.findByTag(newStatus, (sError, sStatus) => {
-    if (sError) {
-      errorResponse(sError, res);
-    } else {
-      body.status = sStatus;
-      Purchases.createPurchases(body,
-        (error, purchases) => jsonResponse(error, { purchases }, res));
-    }
-  });
+  const newStatus = helpers.createPurchaseStatus(body.cpf);
+  body.status = newStatus;
+  Purchases.createPurchases(body,
+    (error, purchases) => jsonResponse(error, { purchases }, res));
 };
 
 controller.updatePurchases = (req, res) => {
@@ -73,9 +53,34 @@ controller.updatePurchases = (req, res) => {
 };
 
 controller.deletePurchases = (req, res) => {
-  Purchases.deletePurchases(req.params.id, (error, deleted) => {
-    const isDeleted = deleted && !isEmptyObject(deleted);
-    jsonResponse(error, { deleted: isDeleted || false }, res);
+  const { id } = req.params;
+  const { cpf, role } = req.user;
+  Purchases.getOnePurchases(id, (error, purchase) => {
+    if (error) {
+      errorResponse(error, res);
+    } else {
+      let errorDelete;
+      const userPurchase = helpers.validateUserPurchase(purchase, role, cpf);
+      if (!userPurchase) {
+        errorDelete = assembleError({
+          message: 'Purchase Not Found or Wrong Credentials!',
+          statusCode: 422,
+        });
+      } else if (userPurchase.status.tag !== statusTags.EmValidacao) {
+        errorDelete = assembleError({
+          message: 'Can\'t Delete A Purchase Which Status Isn\'t "EM VALIDAÇÂO" !',
+          statusCode: 422,
+        });
+      }
+      if (errorDelete) {
+        errorResponse(errorDelete, res);
+      } else {
+        Purchases.deletePurchases(id, (dError, deleted) => {
+          const isDeleted = deleted && !isEmptyObject(deleted);
+          jsonResponse(dError, { deleted: isDeleted || false }, res);
+        });
+      }
+    }
   });
 };
 

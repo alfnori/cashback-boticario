@@ -5,9 +5,12 @@ const { transformRequestErrors } = require('../../utils/transformer');
 
 const assembleError = (data = {}) => transformRequestErrors({
   msg: data.message || data.msg || 'Invalid resource!',
+  name: data.name || '',
+  kind: data.kind || '',
   value: data.value || '',
   location: data.path || data.location || '',
   param: data.param || data.key || 'resource',
+  statusCode: data.statusCode || null,
 });
 
 const validateRequest = (req, res, next) => {
@@ -15,6 +18,9 @@ const validateRequest = (req, res, next) => {
   let nextRequest = next;
   if (error && error.isEmpty && !error.isEmpty()) {
     error = transformRequestErrors(error);
+    // eslint-disable-next-line no-underscore-dangle
+    delete error._message;
+    error.statusCode = 422;
     res.status(422).send({ error });
     res.end();
     logRequest('Invalid Request!');
@@ -38,7 +44,7 @@ const httpResponse = (data, res) => {
 
 const jsonResponse = (error, entity, res) => {
   if (error && !isEmptyObject(error)) {
-    res.status(500).send({ error });
+    res.status(error.statusCode || 500).send({ error });
     logError(error);
   } else {
     res.send(entity);
