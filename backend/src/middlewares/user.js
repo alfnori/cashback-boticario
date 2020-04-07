@@ -27,8 +27,8 @@ const signUP = () => [
     .trim()
     .escape()
     .isLength({ min: 11 })
-    .custom((value, { req }) => {
-      if (!validateCPF(req.body.cpf)) {
+    .custom((value) => {
+      if (!validateCPF(value)) {
         throw new Error(messages.cpf.default);
       }
       return true;
@@ -37,10 +37,10 @@ const signUP = () => [
   body('password')
     .trim()
     .isLength({ min: 8 })
-    .custom((value, { req }) => {
-      if (!strongPassword(req.body.password)) {
+    .custom((value) => {
+      if (!strongPassword(value)) {
         throw new Error(
-          'Weak password! Must contain at least: 1 uppcase, 1 lowercase, 1 number and 1 special character.'
+          'Weak password! Must contain at least: 1 uppcase, 1 lowercase, 1 number and 1 special character.',
         );
       }
       return true;

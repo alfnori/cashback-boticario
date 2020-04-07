@@ -1,5 +1,5 @@
 const statusRoutes = require('./status');
-const employeeRoutes = require('./employee');
+const purchasesRoutes = require('./purchases');
 const userRoutes = require('./user');
 
 const {
@@ -28,7 +28,7 @@ const init = (app) => {
   app.get('/', welcomeRoute);
   app.get('/public/counter', counterRoute);
   app.use('/api/status', statusRoutes);
-  app.use('/api/employee', employeeRoutes);
+  app.use('/api/purchases', purchasesRoutes);
   app.use('/api/auth', userRoutes);
   app.get('/api/user/current', controller.currentUser);
   app.get('*', notFoundResponse);

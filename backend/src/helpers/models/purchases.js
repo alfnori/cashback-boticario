@@ -14,27 +14,15 @@ const assertFilter = (config) => {
   let filter;
   if (search) {
     filter = {
-      name: search,
-      email: search,
-      document: search,
+      code: search,
+      cpf: search,
     };
   } else {
     filter = parseJSON(config.filter, {});
   }
   let resultFilter = {};
-  if (filter.name) resultFilter.name = mongooseRegex(filter.name);
-  if (filter.email) {
-    const email = mongooseRegex(filter.email);
-    if (search) {
-      resultFilter['email.work'] = email;
-      resultFilter['email.personal'] = email;
-    } else {
-      resultFilter.$or = [];
-      resultFilter.$or.push({ 'email.work': email });
-      resultFilter.$or.push({ 'email.personal': email });
-    }
-  }
-  if (filter.document) resultFilter.document = mongooseRegex(filter.document.replace(/[^\w]/, ''));
+  if (filter.code) resultFilter.code = mongooseRegex(filter.code);
+  if (filter.cpf) resultFilter.cpf = mongooseRegex(filter.cpf.replace(/[^\w]/g, ''));
   if (isEmptyObject(resultFilter)) return {};
   if (search) {
     resultFilter = { $or: transpileObject(resultFilter) };

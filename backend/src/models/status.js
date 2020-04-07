@@ -1,18 +1,12 @@
 const mongoose = require('mongoose');
-
-const { Schema } = mongoose;
-
-const StatusSchema = new Schema({
-  name: String,
-  order: Number,
-  tag: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-});
-
-StatusSchema.index({ tag: 1 }, { unique: true });
+const { StatusSchema } = require('./schemas/status');
+const { logDatabase } = require('../utils/logger');
 
 const Status = mongoose.model('Status', StatusSchema);
+
+Status.findByTag = (tag, callback) => {
+  logDatabase('QUERY: Executing findOneByTag - By Email');
+  Status.findOne({ tag }).exec(callback);
+};
+
 module.exports = Status;

@@ -4,7 +4,7 @@ const { envs, get } = require('../../utils/env');
 
 const saltRounds = 10;
 const appSecretJWT = get(envs.APP_JWT_SECRET);
-const expirationTime = '1y'; // get(envs.JWT_EXPIRATION, '1y'); // Long for testing only
+const expirationTime = '1y'; // get(envs.JWT_EXPIRATION, '7d'); // Long for testing only
 
 const strongPassword = (password) => {
   if (Boolean(get(envs.STRONG_PASSWORD, true)) === false) {

@@ -76,40 +76,27 @@ const transformRequestErrors = (requestErrors) => {
     if (requestErrors.array) {
       errors = requestErrors.array();
     }
+    const errorsAsArray = errors.map((err) => ({ [err.param]: err }));
+    const callbackRec = (err) => {
+      const {
+        value, msg, location, name, kind,
+      } = err;
+      return {
+        message: msg || 'Invalid value',
+        name: name || 'ValidatorError',
+        kind: kind || 'invalidRequest',
+        path: location || '',
+        value: value || '',
+      };
+    };
     error = {
-      // errors: recompileObject(errors.map((err) => {
-      //   const {
-      //     value, msg, param, location,
-      //   } = err;
-      //   const errorBody = {
-      //     message: msg || 'Invalid value',
-      //     name: 'ValidatorError',
-      //     kind: 'invalidRequest',
-      //     path: location,
-      //     value,
-      //   };
-      //   return { [param]: errorBody };
-      // })),
-      errors: recompileObject(errors.map((err) => {
-        const { param } = err;
-        return { [param]: err };
-      }),
-      (err) => {
-        const {
-          value, msg, location,
-        } = err;
-        return {
-          message: msg || 'Invalid value',
-          name: 'ValidatorError',
-          kind: 'invalidRequest',
-          path: location || '',
-          value: value || '',
-        };
-      }),
-      _message: 'Invalid request',
+      errors: recompileObject(errorsAsArray, callbackRec),
       message: 'Invalid request',
       name: 'ValidationRequestError',
     };
+  }
+  if (requestErrors && !isEmptyObject(requestErrors) && requestErrors.statusCode) {
+    error.statusCode = requestErrors.statusCode;
   }
   return error;
 };

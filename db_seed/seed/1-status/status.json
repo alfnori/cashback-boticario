@@ -2,7 +2,7 @@
     {
         "_id": {"$oid": "5e1b2b29d9c96d08e36ee2dc"},
         "name": "Em validação",
-        "tag": "MV",
+        "tag": "EV",
         "order": 1
     },
     {
@@ -14,7 +14,7 @@
     {
         "_id": {"$oid": "5e1b2b29d9c96d0af46ee2de"},
         "name": "Aprovado",
-        "tag": "AP                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ",
+        "tag": "AP",
         "order": 3
     }
 ]

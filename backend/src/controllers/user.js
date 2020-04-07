@@ -27,6 +27,9 @@ controller.authenticate = (req, res) => {
         const customError = assembleError({
           message: 'User Not Found!',
           param: 'email',
+          path: 'body',
+          value: req.body.email,
+          statusCode: 401,
         });
         jsonResponse(customError, null, res);
       } else {
@@ -36,6 +39,9 @@ controller.authenticate = (req, res) => {
               const customError = assembleError({
                 message: "Password Doesn't Match!",
                 param: 'password',
+                path: 'body',
+                value: req.body.password,
+                statusCode: 401,
               });
               jsonResponse(customError, null, res);
             } else {
@@ -70,6 +76,8 @@ controller.currentUser = (req, res) => {
     const customError = assembleError({
       message: 'Invalid User from token!',
       param: 'token',
+      path: 'header',
+      statusCode: 403,
     });
     jsonResponse(customError, null, res);
   }
