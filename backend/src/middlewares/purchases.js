@@ -24,8 +24,12 @@ const sanitizeCpf = (value, { req }) => {
 
 const assertMatchCPF = (value, { req }) => {
   const skipValidation = req.user.role === userRoles.ADMIN;
-  if (!skipValidation && validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
-    throw new Error("Informed CPF doesn't match with one in user token.");
+  if (!skipValidation) {
+    if (!value) {
+      throw new Error('The field CPF must be informed.');
+    } else if (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
+      throw new Error("Informed CPF doesn't match with one in user token.");
+    }
   }
   return true;
 };
@@ -120,10 +124,13 @@ const oneIsValid = (req, res, next) => {
 };
 
 const oneValidator = (skipCodeAndCPF = false) => [
-  body('code').trim()
+  body('code')
+    .trim()
     .custom((v, o) => (skipCodeAndCPF ? true : validateCode(v, o))),
-  body('cpf').trim().customSanitizer(sanitizeCpf)
-    .custom((v, o) => (skipCodeAndCPF ? true : assertMatchCPF(v, o))),
+  body('cpf')
+    .trim()
+    .customSanitizer(sanitizeCpf)
+    .custom((v, o) => (skipCodeAndCPF ? true : v && (assertMatchCPF(v, o)))),
   body('date').trim().escape().isISO8601()
     .toDate(),
   body('value').trim().escape().isFloat()

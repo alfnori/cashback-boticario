@@ -9,8 +9,8 @@ const Status = require('../../models/status');
 
 const PurchaseErrors = {
   NotOwnerOrAdmin: 'NotOwnerOrAdmin',
-  CantDeleteNotEV: 'userNotFound',
-  CantUpdateNotEV: 'userNotFound',
+  CantUpdateNotEV: 'CantUpdateNotEV',
+  CantDeleteNotEV: 'CantDeleteNotEV',
 };
 
 const getError = (errorType) => {

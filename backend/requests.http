@@ -22,10 +22,10 @@ Authorization: Bearer {{token}}
 ### Get purchases list
 ###sort={"date":"desc"}&filter={"code": "ABC"}&search=056
 GET {{host}}/api/purchases?
-Authorization: Bearer {{specialToken}} 
+Authorization: Bearer {{token}}
 
 ### Get purchases list by cpf
-GET {{host}}/api/purchases/cpf/{{myCPF}}?sort={"date":"desc"}
+GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}} 
 
 ### Get one purchases
@@ -38,14 +38,14 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC1234002",
+    "code": "ABC1234004",
     "cpf": "{{specialCPF}}",
     "date": "2020-04-04T03:00:00.000Z",
     "value": 3333.33
 }
 
 ### Update purchases
-PUT {{host}}/api/purchases/update/5e8f82f2c1ce9f00dcb8f68b HTTP/1.1
+PUT {{host}}/api/purchases/update/5e8f992787492403abec982b HTTP/1.1
 Authorization: Bearer {{specialToken}} 
 content-type: application/json
 
@@ -55,7 +55,7 @@ content-type: application/json
 }
 
 ### Delete purchases
-DELETE {{host}}/api/purchases/delete/5e8f8132f69ee900a0708f6d
+DELETE {{host}}/api/purchases/delete/5e8f830cc1ce9f00dcb8f68d
 Authorization: Bearer {{token}} 
 
 
