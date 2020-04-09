@@ -1,5 +1,6 @@
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjI3NTYwOCwiZXhwIjoxNjE3ODMzMjA4fQ.tC8gwCTEsjr7vSw_zzFq4XwlKCPJhyflljxuzM9-GBg
-@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3BlY2lhbCBVc2VyIiwiY3BmIjoiMTUzLjUwOS40NjAtNTYiLCJlbWFpbCI6InNwZWNpYWxAdXNlci5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1ODYyODU5OTgsImV4cCI6MTYxNzg0MzU5OH0.I262JcLPjPtClw5l1GeydEqMV01STwAaeWC-Mp0TjP4
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjQ1ODU2NywiZXhwIjoxNjE4MDE2MTY3fQ.xMSveWgO3AQpdgaZpp7MpO7AmFZ6bRA3vN27qY3cjZ0
+
+@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3BlY2lhbCBVc2VyIiwiY3BmIjoiMTUzLjUwOS40NjAtNTYiLCJlbWFpbCI6InNwZWNpYWxAdXNlci5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjQ1ODUzMiwiZXhwIjoxNjE4MDE2MTMyfQ.x6-o_BR59F3evF-mq7pYbHdMxTQ2DbCSvNnA9-D-yKo
 
 @host=http://localhost:8089
 @myCPF=065.909.710-99
@@ -63,7 +64,7 @@ Authorization: Bearer {{specialToken}}
 
 ### Get user from token
 GET {{host}}/api/user/current
-Authorization: Bearer {{specialToken}} 
+Authorization: Bearer {{token}} 
 
 ### Create user
 POST {{host}}/api/auth/sign/up HTTP/1.1
@@ -73,7 +74,7 @@ content-type: application/json
     "name": "Special User",
     "email": "special@user.com",
     "cpf": "153.509.460-56",
-    "password": "S3crt3t$",
+    "password": "S3csrt3t$",
     "passwordConfirm": "S3crt3t$"
 }
 
@@ -82,6 +83,6 @@ POST {{host}}/api/auth/sign/in HTTP/1.1
 content-type: application/json
 
 {
-    "email": "special@user.com",
+    "email": "alfnori@gmail.com",
     "password": "S3crt3t$"
 }

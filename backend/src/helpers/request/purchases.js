@@ -6,7 +6,7 @@ const { envs, get } = require('../../utils/env');
 const Status = require('../../models/status');
 
 const validateUserPurchase = (purchase, role, cpf) => {
-  let userPurchase = purchase;
+  let userPurchase = { ...purchase };
   if (userPurchase && userPurchase.cpf) {
     if (role !== userRoles.ADMIN) {
       const purchaseCPF = validatorCPF.strip(purchase.cpf);
@@ -19,16 +19,17 @@ const validateUserPurchase = (purchase, role, cpf) => {
   return userPurchase;
 };
 
-const createPurchaseStatus = async (cpf) => {
+const newPurchaseData = async (purchaseData) => {
+  const newPurchase = { ...purchaseData };
   let newStatus = statusTags.EmValidacao;
-  if (cpf === validatorCPF.strip(get(envs.SPECIAL_CPF, '153.509.460-56'))) {
+  if (newPurchase.cpf === validatorCPF.strip(get(envs.SPECIAL_CPF, '153.509.460-56'))) {
     newStatus = statusTags.Aprovado;
   }
-  const statusTag = await Status.findByTag(newStatus);
-  return statusTag;
+  newPurchase.status = await Status.findByTag(newStatus);
+  return newPurchase;
 };
 
 module.exports = {
   validateUserPurchase,
-  createPurchaseStatus,
+  newPurchaseData,
 };

@@ -1,10 +1,10 @@
 const { validationResult } = require('express-validator');
 const { logRequest, logError } = require('../../utils/logger');
 const { isEmptyObject } = require('../../utils/checker');
-const { transformRequestErrors } = require('../../utils/transformer');
+const { transformRequestErrors, requestErrors } = require('../../utils/transformer');
 
 const assembleError = (data = {}) => transformRequestErrors({
-  msg: data.message || data.msg || 'Invalid resource!',
+  msg: data.message || data.msg || data.error || 'Invalid resource!',
   name: data.name || '',
   kind: data.kind || '',
   value: data.value || '',
@@ -13,14 +13,19 @@ const assembleError = (data = {}) => transformRequestErrors({
   statusCode: data.statusCode || null,
 });
 
+const assembleRequestError = (data = {}) => requestErrors({
+  errors: data.errors || null,
+  message: data.message || data.msg || data.error || 'Invalid data received!',
+  name: data.name || data.type || data.error || 'InvalidData',
+  statusCode: data.code || data.statusCode || 400,
+  stackTrace: data.stackTrace || data.stack || null,
+});
+
 const validateRequest = (req, res, next) => {
   let error = validationResult(req);
   let nextRequest = next;
   if (error && error.isEmpty && !error.isEmpty()) {
     error = transformRequestErrors(error);
-    // eslint-disable-next-line no-underscore-dangle
-    delete error._message;
-    error.statusCode = 422;
     res.status(422).send({ error });
     res.end();
     logRequest('Invalid Request!');
@@ -33,7 +38,12 @@ const validateRequest = (req, res, next) => {
 
 const notFoundResponse = (req, res) => {
   logRequest(`Got 404 on ${req ? req.url : ''}`);
-  res.status(404).send({ statusCode: 404, message: 'Invalid Resource!' });
+  const error = assembleRequestError({
+    message: 'Invalid Resource!',
+    name: 'NotFound',
+    statusCode: 404,
+  });
+  res.status(404).send({ error });
 };
 
 const httpResponse = (data, res) => {
@@ -55,11 +65,27 @@ const errorResponse = (error, res) => {
   jsonResponse(error, null, res);
 };
 
+const handleError = (func) => (req, res, next) => {
+  func(req, res, next).catch((err) => {
+    const error = assembleRequestError({
+      message: err.message || 'Something got terrible wrong!',
+      name: err.name || 'CriticalError',
+      statusCode: err.code || 500,
+      stackTrace: err.stack,
+    });
+    logError('CRITICAL FAILURE!');
+    logError(error.message);
+    res.status(error.statusCode).send({ error });
+  });
+};
+
 module.exports = {
   assembleError,
+  assembleRequestError,
   jsonResponse,
   errorResponse,
   validateRequest,
   notFoundResponse,
   httpResponse,
+  handleError,
 };

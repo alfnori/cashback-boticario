@@ -1,5 +1,6 @@
 
 const envs = {
+  NODE_ENV: 'NODE_ENV',
   PORT: 'PORT',
   APP_JWT_SECRET: 'APP_JWT_SECRET',
   JWT_EXPIRATION: 'JWT_EXPIRATION',
@@ -12,8 +13,10 @@ const envs = {
 };
 
 const get = (envTag, defaultValue = null) => process.env[envTag] || defaultValue;
+const equals = (envTag, search, defaultValue = null) => get(envTag, defaultValue) === search;
 
 module.exports = {
   envs,
   get,
+  equals,
 };

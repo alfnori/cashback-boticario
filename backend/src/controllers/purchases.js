@@ -1,7 +1,9 @@
 const controller = {};
 
 const helpers = require('../helpers/request/purchases');
-const { jsonResponse, errorResponse, assembleError } = require('../helpers/request');
+const {
+  jsonResponse, errorResponse, assembleError,
+} = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const { userRoles } = require('../models/schemas/user');
 const { statusTags } = require('../models/schemas/status');
@@ -39,11 +41,10 @@ controller.getOnePurchases = (req, res) => {
     });
 };
 
-controller.createPurchases = (req, res) => {
+controller.createPurchases = async (req, res) => {
   const { body } = req;
-  const newStatus = helpers.createPurchaseStatus(body.cpf);
-  body.status = newStatus;
-  Purchases.createPurchases(body,
+  const newPurchase = await helpers.newPurchaseData(body);
+  Purchases.createPurchases(newPurchase,
     (error, purchases) => jsonResponse(error, { purchases }, res));
 };
 
