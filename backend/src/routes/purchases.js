@@ -45,7 +45,7 @@ purchasesRouter.post('/create',
 purchasesRouter.put('/update/:id',
   middleware.idValidator(),
   middleware.idIsValid,
-  middleware.oneValidator(),
+  middleware.oneValidator(true),
   middleware.oneIsValid,
   handleError(async (req, res, next) => {
     logRequest('UPDATE ONE PURCHASE');

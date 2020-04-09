@@ -39,7 +39,9 @@ Purchases.createPurchases = (data, callback) => {
 
 Purchases.updatePurchases = (id, data, callback) => {
   logDatabase('MODEL: Executing update');
-  Purchases.findByIdAndUpdate(id, data, { new: true }).exec(callback);
+  Purchases.findByIdAndUpdate(id, data, { new: true })
+    .populate('status')
+    .exec(callback);
 };
 
 Purchases.deletePurchases = (id, callback) => {

@@ -119,11 +119,11 @@ const oneIsValid = (req, res, next) => {
   return validateRequest(req, res, next);
 };
 
-const oneValidator = () => [
-  body('code').trim().exists().custom(validateCode),
+const oneValidator = (skipCodeAndCPF = false) => [
+  body('code').trim()
+    .custom((v, o) => (skipCodeAndCPF ? true : validateCode(v, o))),
   body('cpf').trim().customSanitizer(sanitizeCpf)
-    .custom(assertMatchCPF)
-    .isLength({ min: 11 }),
+    .custom((v, o) => (skipCodeAndCPF ? true : assertMatchCPF(v, o))),
   body('date').trim().escape().isISO8601()
     .toDate(),
   body('value').trim().escape().isFloat()
