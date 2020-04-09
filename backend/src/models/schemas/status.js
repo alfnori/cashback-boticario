@@ -19,6 +19,7 @@ const StatusSchema = new Schema({
   },
 });
 
+StatusSchema.set('toJSON', { getters: true, virtuals: false });
 StatusSchema.index({ tag: 1 }, { unique: true });
 
 module.exports = {

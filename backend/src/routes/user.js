@@ -3,6 +3,7 @@ const express = require('express');
 const userRouter = express.Router();
 
 const middleware = require('../middlewares/user');
+const { handleError } = require('../helpers/request');
 const { logRequest } = require('../utils/logger');
 
 const controller = require('../controllers/user');
@@ -10,17 +11,17 @@ const controller = require('../controllers/user');
 userRouter.post('/sign/in',
   middleware.signIN(),
   middleware.signInIsValid,
-  (req, res) => {
+  handleError(async (req, res, next) => {
     logRequest('AUTHENTICATE USER');
-    controller.authenticate(req, res);
-  });
+    controller.authenticate(req, res, next);
+  }));
 
 userRouter.post('/sign/up',
   middleware.signUP(),
   middleware.signUpIsValid,
-  (req, res) => {
+  handleError(async (req, res, next) => {
     logRequest('REGISTER USER');
-    controller.register(req, res);
-  });
+    controller.register(req, res, next);
+  }));
 
 module.exports = userRouter;

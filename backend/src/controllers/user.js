@@ -1,85 +1,44 @@
 const controller = {};
 
-const { assembleError, jsonResponse } = require('../helpers/request');
+const { errorResponse } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
-
+const {
+  userTokenResponse, userErrorResponse, UserErrors,
+} = require('../helpers/request/user');
 const UserModel = require('../models/user');
 
-const assembleUser = (data) => ({
-  user: {
-    name: data.name,
-    email: data.email,
-    cpf: data.cpf,
-    role: data.role,
-  },
-});
-
-const tokenResponse = (user, res) => {
-  const jwtToken = UserModel.generateJWT(user);
-  jsonResponse(null, { token: jwtToken, ...assembleUser(user) }, res);
-};
-
 controller.authenticate = (req, res) => {
-  try {
-    UserModel.getUserByEmail(req.body.email, (error, user) => {
-      if (error) jsonResponse(error, null, res);
-      else if (!user || !user.password) {
-        const customError = assembleError({
-          message: 'User Not Found!',
-          param: 'email',
-          path: 'body',
-          value: req.body.email,
-          statusCode: 401,
-        });
-        jsonResponse(customError, null, res);
-      } else {
-        try {
-          UserModel.compareSecrets(req.body.password, user.password, (err, matched) => {
-            if (err || !matched) {
-              const customError = assembleError({
-                message: "Password Doesn't Match!",
-                param: 'password',
-                path: 'body',
-                value: req.body.password,
-                statusCode: 401,
-              });
-              jsonResponse(customError, null, res);
-            } else {
-              tokenResponse(user, res);
-            }
-          });
-        } catch (err) {
-          jsonResponse(err, null, res);
+  UserModel.getUserByEmail(req.body.email, (error, user) => {
+    if (error || !user || !user.password) {
+      userErrorResponse(UserErrors.UserNotFound, res, req.body.email);
+    } else {
+      UserModel.compareSecrets(req.body.password, user.password, (err, matched) => {
+        if (err || !matched) {
+          userErrorResponse(UserErrors.PasswordDoesntMatch, res, req.body.password);
+        } else {
+          userTokenResponse(user, res);
         }
-      }
-    });
-  } catch (error) {
-    jsonResponse(error, null, res);
-  }
+      });
+    }
+  });
 };
 
 controller.register = (req, res) => {
   try {
     UserModel.createUser(req.body, (error, user) => {
-      if (error) jsonResponse(error, null, res);
-      else tokenResponse(user, res);
+      if (error) errorResponse(error, res);
+      else userTokenResponse(user, res);
     });
   } catch (error) {
-    jsonResponse(error, null, res);
+    errorResponse(error, res);
   }
 };
 
 controller.currentUser = (req, res) => {
   if (!isEmptyObject(req.user)) {
-    jsonResponse(null, assembleUser(req.user), res);
+    userTokenResponse(req.user, res);
   } else {
-    const customError = assembleError({
-      message: 'Invalid User from token!',
-      param: 'token',
-      path: 'header',
-      statusCode: 403,
-    });
-    jsonResponse(customError, null, res);
+    userErrorResponse(UserErrors.InvalidUserToken, res);
   }
 };
 

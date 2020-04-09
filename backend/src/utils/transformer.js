@@ -1,6 +1,7 @@
 const sanitizer = require('sanitizer');
 
 const { isEmptyObject, isFunction } = require('./checker');
+const { equals, envs } = require('./env');
 
 const parseJSON = (json, defaultValue = {}) => {
   let parsed;
@@ -69,12 +70,33 @@ const recompileObject = (array, callbackValue = null, keyPath = '') => {
   return object;
 };
 
-const transformRequestErrors = (requestErrors) => {
+const requestErrors = (config = {}) => {
+  let error = {
+    message: config.message || 'Invalid request',
+    name: config.name || 'ValidationRequestError',
+  };
+  if (config.statusCode) {
+    error.statusCode = config.statusCode;
+  }
+  if (config.errors) {
+    error = { errors: config.errors, ...error };
+  }
+  if (config.stackTrace && equals(envs.NODE_ENV, 'development')) {
+    error.stackTrace = config.stackTrace;
+  }
+  return error;
+};
+
+const transformRequestErrors = (rErrors) => {
   let error;
-  if (requestErrors && (requestErrors.array || !isEmptyObject(requestErrors))) {
-    let errors = [requestErrors];
-    if (requestErrors.array) {
-      errors = requestErrors.array();
+  let statusCode = null;
+  if (rErrors && (rErrors.array || !isEmptyObject(rErrors))) {
+    let errors;
+    if (rErrors.array) {
+      errors = rErrors.array();
+    } else {
+      errors = [rErrors];
+      statusCode = rErrors.statusCode;
     }
     const errorsAsArray = errors.map((err) => ({ [err.param]: err }));
     const callbackRec = (err) => {
@@ -89,14 +111,12 @@ const transformRequestErrors = (requestErrors) => {
         value: value || '',
       };
     };
-    error = {
+    error = requestErrors({
       errors: recompileObject(errorsAsArray, callbackRec),
       message: 'Invalid request',
       name: 'ValidationRequestError',
-    };
-  }
-  if (requestErrors && !isEmptyObject(requestErrors) && requestErrors.statusCode) {
-    error.statusCode = requestErrors.statusCode;
+      statusCode,
+    });
   }
   return error;
 };
@@ -108,4 +128,5 @@ module.exports = {
   transpileObject,
   recompileObject,
   transformRequestErrors,
+  requestErrors,
 };

@@ -1,7 +1,11 @@
 const controller = {};
 
-const helpers = require('../helpers/request/purchases');
-const { jsonResponse, errorResponse, assembleError } = require('../helpers/request');
+const {
+  validateUserPurchase, newPurchaseData, PurchaseErrors, purchaseErrorResponse,
+} = require('../helpers/request/purchases');
+const {
+  jsonResponse, errorResponse,
+} = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const { userRoles } = require('../models/schemas/user');
 const { statusTags } = require('../models/schemas/status');
@@ -33,23 +37,49 @@ controller.getOnePurchases = (req, res) => {
       if (error) {
         errorResponse(error, res);
       } else {
-        const userPurchase = helpers.validateUserPurchase(purchase, role, cpf);
-        jsonResponse(null, { purchase: userPurchase }, res);
+        const userPurchase = validateUserPurchase(purchase, role, cpf);
+        if (!userPurchase) {
+          purchaseErrorResponse(PurchaseErrors.NotOwnerOrAdmin, res);
+        } else {
+          jsonResponse(null, { purchase }, res);
+        }
       }
     });
 };
 
-controller.createPurchases = (req, res) => {
+controller.createPurchases = (req, res, next) => {
   const { body } = req;
-  const newStatus = helpers.createPurchaseStatus(body.cpf);
-  body.status = newStatus;
-  Purchases.createPurchases(body,
-    (error, purchases) => jsonResponse(error, { purchases }, res));
+  newPurchaseData(body, (err, newPurchase) => {
+    if (err) next(err);
+    else {
+      Purchases.createPurchases(newPurchase, (error, created) => {
+        jsonResponse(error, { purchase: created }, res);
+      });
+    }
+  });
 };
 
 controller.updatePurchases = (req, res) => {
-  Purchases.updatePurchases(req.params.id, req.body,
-    (error, purchases) => jsonResponse(error, { purchases }, res));
+  const { id } = req.params;
+  const { cpf, role } = req.user;
+  Purchases.getOnePurchases(id, (error, purchase) => {
+    if (error) {
+      errorResponse(error, res);
+    } else {
+      const userPurchase = validateUserPurchase(purchase, role, cpf);
+      if (!userPurchase) {
+        purchaseErrorResponse(PurchaseErrors.NotOwnerOrAdmin, res);
+      } else if (!purchase.status || (purchase.status.tag !== statusTags.EmValidacao)) {
+        purchaseErrorResponse(PurchaseErrors.CantUpdateNotEV, res);
+      } else {
+        const { body } = req;
+        const updateFields = { date: body.date, value: body.value };
+        Purchases.updatePurchases(id, updateFields, (err, updated) => {
+          jsonResponse(err, { purchase: updated }, res);
+        });
+      }
+    }
+  });
 };
 
 controller.deletePurchases = (req, res) => {
@@ -59,21 +89,11 @@ controller.deletePurchases = (req, res) => {
     if (error) {
       errorResponse(error, res);
     } else {
-      let errorDelete;
-      const userPurchase = helpers.validateUserPurchase(purchase, role, cpf);
+      const userPurchase = validateUserPurchase(purchase, role, cpf);
       if (!userPurchase) {
-        errorDelete = assembleError({
-          message: 'Purchase Not Found or Wrong Credentials!',
-          statusCode: 422,
-        });
-      } else if (userPurchase.status.tag !== statusTags.EmValidacao) {
-        errorDelete = assembleError({
-          message: 'Can\'t Delete A Purchase Which Status Isn\'t "EM VALIDAÇÂO" !',
-          statusCode: 422,
-        });
-      }
-      if (errorDelete) {
-        errorResponse(errorDelete, res);
+        purchaseErrorResponse(PurchaseErrors.NotOwnerOrAdmin, res);
+      } else if (!purchase.status || (purchase.status.tag !== statusTags.EmValidacao)) {
+        purchaseErrorResponse(PurchaseErrors.CantDeleteNotEV, res);
       } else {
         Purchases.deletePurchases(id, (dError, deleted) => {
           const isDeleted = deleted && !isEmptyObject(deleted);

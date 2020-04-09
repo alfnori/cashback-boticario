@@ -3,6 +3,7 @@ const purchasesRoutes = require('./purchases');
 const userRoutes = require('./user');
 
 const {
+  handleError,
   notFoundResponse,
   httpResponse,
   jsonResponse,
@@ -30,7 +31,9 @@ const init = (app) => {
   app.use('/api/status', statusRoutes);
   app.use('/api/purchases', purchasesRoutes);
   app.use('/api/auth', userRoutes);
-  app.get('/api/user/current', controller.currentUser);
+  app.get('/api/user/current', handleError(async (req, res, next) => {
+    controller.currentUser(req, res, next);
+  }));
   app.get('*', notFoundResponse);
 };
 

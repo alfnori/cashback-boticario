@@ -6,8 +6,20 @@ const helpers = require('../helpers/models/user');
 const Users = mongoose.model('Users', UsersSchema);
 
 // Methods
-Users.generateSecrets = helpers.generateSecrets;
-Users.compareSecrets = helpers.compareSecrets;
+Users.generateSecrets = (password, callback) => {
+  try {
+    helpers.generateSecrets(password, callback);
+  } catch (error) {
+    callback(error);
+  }
+};
+Users.compareSecrets = (password, encrypted, callback) => {
+  try {
+    helpers.compareSecrets(password, encrypted, callback);
+  } catch (error) {
+    callback(error);
+  }
+};
 Users.generateJWT = (user) => helpers.generateJWT(user);
 
 Users.getUserByEmail = (email, callback) => {
@@ -17,7 +29,7 @@ Users.getUserByEmail = (email, callback) => {
 
 Users.createUser = (data, callback) => {
   logDatabase('MODEL: Executing create');
-  helpers.generateSecrets(data.password, (error, secrets) => {
+  Users.generateSecrets(data.password, (error, secrets) => {
     if (error) {
       callback(error);
     } else {

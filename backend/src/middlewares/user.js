@@ -17,7 +17,7 @@ const signUpIsValid = (req, res, next) => {
 };
 
 const signIN = () => [
-  body('email').trim().normalizeEmail().isEmail(),
+  body('email').trim().isEmail(),
   body('password').trim().isLength({ min: 8 }),
 ];
 
@@ -33,7 +33,7 @@ const signUP = () => [
       }
       return true;
     }),
-  body('email').trim().normalizeEmail().isEmail(),
+  body('email').trim().isEmail(),
   body('password')
     .trim()
     .isLength({ min: 8 })

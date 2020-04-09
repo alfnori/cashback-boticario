@@ -1,5 +1,6 @@
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjI3NTYwOCwiZXhwIjoxNjE3ODMzMjA4fQ.tC8gwCTEsjr7vSw_zzFq4XwlKCPJhyflljxuzM9-GBg
-@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3BlY2lhbCBVc2VyIiwiY3BmIjoiMTUzLjUwOS40NjAtNTYiLCJlbWFpbCI6InNwZWNpYWxAdXNlci5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1ODYyODU5OTgsImV4cCI6MTYxNzg0MzU5OH0.I262JcLPjPtClw5l1GeydEqMV01STwAaeWC-Mp0TjP4
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjQ1ODU2NywiZXhwIjoxNjE4MDE2MTY3fQ.xMSveWgO3AQpdgaZpp7MpO7AmFZ6bRA3vN27qY3cjZ0
+
+@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXogQWRtaW4iLCJjcGYiOiIxNzEuNDEyLjMxMC0zMCIsImVtYWlsIjoiYWRtaW4uYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1ODY0NjIwNjksImV4cCI6MTYxODAxOTY2OX0.HAWIAjm_Qk4jI8xgY5LG6fWKH-T8hBlK_gynSmJ8m4M
 
 @host=http://localhost:8089
 @myCPF=065.909.710-99
@@ -19,15 +20,16 @@ Authorization: Bearer {{token}}
 #### PURCHASES
 
 ### Get purchases list
-GET {{host}}/api/purchases?sort={"date":"desc"}&filter={"code": "ABC"}&sxearch=056
-Authorization: Bearer {{specialToken}} 
+###sort={"date":"desc"}&filter={"code": "ABC"}&search=056
+GET {{host}}/api/purchases?
+Authorization: Bearer {{token}}
 
 ### Get purchases list by cpf
 GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}} 
 
 ### Get one purchases
-GET {{host}}/api/purchases/5e8cd2f672778d0336c75cf1
+GET {{host}}/api/purchases/5e8f830cc1ce9f00dcb8f68d
 Authorization: Bearer {{specialToken}}
 
 ### Create purchases
@@ -36,34 +38,32 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC1234000",
-    "cpf": "{{myCPF}}",
+    "code": "ABC1234004",
+    "cpf": "{{specialCPF}}",
     "date": "2020-04-04T03:00:00.000Z",
     "value": 3333.33
 }
 
 ### Update purchases
-PUT {{host}}/api/purchases/update/5e8c944e90e748004194b904 HTTP/1.1
-Authorization: Bearer {{token}} 
+PUT {{host}}/api/purchases/update/5e8f992787492403abec982b HTTP/1.1
+Authorization: Bearer {{specialToken}} 
 content-type: application/json
 
 {
-    "code": "ABC1234560",
-    "cpf": "50510242200",
     "date": "2020-04-04T03:00:00.000Z",
-    "value": 5555.55
+    "value": 1234.55
 }
 
 ### Delete purchases
-DELETE {{host}}/api/purchases/delete/xxxxxxxxxxx5e8cdcb720458b03a282d3e1
-Authorization: Bearer {{specialToken}} 
+DELETE {{host}}/api/purchases/delete/5e8f830cc1ce9f00dcb8f68d
+Authorization: Bearer {{token}} 
 
 
 #### USERS
 
 ### Get user from token
 GET {{host}}/api/user/current
-Authorization: Bearer {{specialToken}} 
+Authorization: Bearer {{token}} 
 
 ### Create user
 POST {{host}}/api/auth/sign/up HTTP/1.1
@@ -82,6 +82,6 @@ POST {{host}}/api/auth/sign/in HTTP/1.1
 content-type: application/json
 
 {
-    "email": "special@user.com",
+    "email": "admin.alfnori@gmail.com",
     "password": "S3crt3t$"
 }
