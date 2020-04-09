@@ -46,6 +46,7 @@ const PurchasesSchema = new Schema({
 // CPF Getters & Setters
 PurchasesSchema.path('cpf').get((cpf) => validatorCPF.format(cpf));
 PurchasesSchema.path('cpf').set((cpf) => validatorCPF.strip(cpf));
+PurchasesSchema.set('toJSON', { getters: true, virtuals: false });
 
 PurchasesSchema.index({ cpf: 1, date: 1, status: 1 });
 PurchasesSchema.index({ code: 1 }, { unique: true });

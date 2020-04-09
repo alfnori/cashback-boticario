@@ -47,6 +47,7 @@ const UsersSchema = new Schema({
 // CPF Getters & Setters
 UsersSchema.path('cpf').get((cpf) => validatorCPF.format(cpf));
 UsersSchema.path('cpf').set((cpf) => validatorCPF.strip(cpf));
+UsersSchema.set('toJSON', { getters: true, virtuals: false });
 
 // Indexes
 UsersSchema.index({ name: 1, email: 1, cpf: 1 });

@@ -41,11 +41,15 @@ controller.getOnePurchases = (req, res) => {
     });
 };
 
-controller.createPurchases = async (req, res) => {
+controller.createPurchases = (req, res, next) => {
   const { body } = req;
-  const newPurchase = await helpers.newPurchaseData(body);
-  Purchases.createPurchases(newPurchase,
-    (error, purchases) => jsonResponse(error, { purchases }, res));
+  helpers.newPurchaseData(body, (err, newPurchase) => {
+    if (err) next(err);
+    else {
+      Purchases.createPurchases(newPurchase,
+        (error, purchases) => jsonResponse(error, { purchases }, res));
+    }
+  });
 };
 
 controller.updatePurchases = (req, res) => {
@@ -69,7 +73,7 @@ controller.deletePurchases = (req, res) => {
         });
       } else if (userPurchase.status.tag !== statusTags.EmValidacao) {
         errorDelete = assembleError({
-          message: 'Can\'t Delete A Purchase Which Status Isn\'t "EM VALIDAÇÂO" !',
+          message: 'Can\'t Delete A Purchase Which Status Isn\'t "EM VALIDAÇÂO"!',
           statusCode: 422,
         });
       }

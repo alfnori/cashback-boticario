@@ -26,6 +26,8 @@ const validateRequest = (req, res, next) => {
   let nextRequest = next;
   if (error && error.isEmpty && !error.isEmpty()) {
     error = transformRequestErrors(error);
+    // eslint-disable-next-line no-underscore-dangle
+    delete error._message;
     res.status(422).send({ error });
     res.end();
     logRequest('Invalid Request!');
@@ -54,7 +56,10 @@ const httpResponse = (data, res) => {
 
 const jsonResponse = (error, entity, res) => {
   if (error && !isEmptyObject(error)) {
-    res.status(error.statusCode || 500).send({ error });
+    const err = { ...error };
+    // eslint-disable-next-line no-underscore-dangle
+    delete err._message;
+    res.status(error.statusCode || 422).send({ error: err });
     logError(error);
   } else {
     res.send(entity);

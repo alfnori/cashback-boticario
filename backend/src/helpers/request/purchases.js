@@ -19,14 +19,19 @@ const validateUserPurchase = (purchase, role, cpf) => {
   return userPurchase;
 };
 
-const newPurchaseData = async (purchaseData) => {
+const newPurchaseData = (purchaseData, callback) => {
   const newPurchase = { ...purchaseData };
   let newStatus = statusTags.EmValidacao;
   if (newPurchase.cpf === validatorCPF.strip(get(envs.SPECIAL_CPF, '153.509.460-56'))) {
     newStatus = statusTags.Aprovado;
   }
-  newPurchase.status = await Status.findByTag(newStatus);
-  return newPurchase;
+  Status.findByTag(newStatus, (err, status) => {
+    if (err) callback(err);
+    else {
+      newPurchase.status = status;
+      callback(null, newPurchase);
+    }
+  });
 };
 
 module.exports = {

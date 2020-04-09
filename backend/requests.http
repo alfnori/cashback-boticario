@@ -1,6 +1,6 @@
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXoiLCJjcGYiOiIwNjUuOTA5LjcxMC05OSIsImVtYWlsIjoiYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjQ1ODU2NywiZXhwIjoxNjE4MDE2MTY3fQ.xMSveWgO3AQpdgaZpp7MpO7AmFZ6bRA3vN27qY3cjZ0
 
-@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3BlY2lhbCBVc2VyIiwiY3BmIjoiMTUzLjUwOS40NjAtNTYiLCJlbWFpbCI6InNwZWNpYWxAdXNlci5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTU4NjQ1ODUzMiwiZXhwIjoxNjE4MDE2MTMyfQ.x6-o_BR59F3evF-mq7pYbHdMxTQ2DbCSvNnA9-D-yKo
+@specialToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRvbGZvIEx1aXogQWRtaW4iLCJjcGYiOiIxNzEuNDEyLjMxMC0zMCIsImVtYWlsIjoiYWRtaW4uYWxmbm9yaUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1ODY0NjIwNjksImV4cCI6MTYxODAxOTY2OX0.HAWIAjm_Qk4jI8xgY5LG6fWKH-T8hBlK_gynSmJ8m4M
 
 @host=http://localhost:8089
 @myCPF=065.909.710-99
@@ -20,7 +20,8 @@ Authorization: Bearer {{token}}
 #### PURCHASES
 
 ### Get purchases list
-GET {{host}}/api/purchases?sort={"date":"desc"}&filter={"code": "ABC"}&sxearch=056
+###sort={"date":"desc"}&filter={"code": "ABC"}&search=056
+GET {{host}}/api/purchases?
 Authorization: Bearer {{specialToken}} 
 
 ### Get purchases list by cpf
@@ -37,8 +38,8 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC1234000",
-    "cpf": "{{myCPF}}",
+    "code": "ABC1234002",
+    "cpf": "{{specialCPF}}",
     "date": "2020-04-04T03:00:00.000Z",
     "value": 3333.33
 }
@@ -49,8 +50,6 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-    "code": "ABC1234560",
-    "cpf": "50510242200",
     "date": "2020-04-04T03:00:00.000Z",
     "value": 5555.55
 }
@@ -74,7 +73,7 @@ content-type: application/json
     "name": "Special User",
     "email": "special@user.com",
     "cpf": "153.509.460-56",
-    "password": "S3csrt3t$",
+    "password": "S3crt3t$",
     "passwordConfirm": "S3crt3t$"
 }
 
@@ -83,6 +82,6 @@ POST {{host}}/api/auth/sign/in HTTP/1.1
 content-type: application/json
 
 {
-    "email": "alfnori@gmail.com",
+    "email": "admin.alfnori@gmail.com",
     "password": "S3crt3t$"
 }
