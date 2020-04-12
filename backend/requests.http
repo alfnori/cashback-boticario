@@ -20,13 +20,15 @@ Authorization: Bearer {{token}}
 #### PURCHASES
 
 ### Get purchases list
-###sort={"date":"desc"}&filter={"code": "ABC"}&search=056
+###filter={"code": "XYZ"}&search=056
+###filter={"date": "2020-04-05T03:00:00.000Z"}
+###sort={"date": "desc", "value": "desc"}
 GET {{host}}/api/purchases?
-Authorization: Bearer {{token}}
+Authorization: Bearer {{specialToken}}
 
 ### Get purchases list by cpf
 GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
-Authorization: Bearer {{specialToken}} 
+Authorization: Bearer {{specialToken}}
 
 ### Get one purchases
 GET {{host}}/api/purchases/5e8f830cc1ce9f00dcb8f68d
@@ -38,10 +40,10 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC1234004",
-    "cpf": "{{specialCPF}}",
-    "date": "2020-04-04T03:00:00.000Z",
-    "value": 3333.33
+    "code": "ABC1234003",
+    "cpf": "066.402.209-03",
+    "date": "2020-04-05T03:00:00.000Z",
+    "value": 4444.44
 }
 
 ### Update purchases
