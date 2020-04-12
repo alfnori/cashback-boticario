@@ -8,7 +8,7 @@ const expirationTime = '1y'; // get(envs.JWT_EXPIRATION, '7d'); // Long for test
 
 const strongPassword = (password) => {
   if (Boolean(get(envs.STRONG_PASSWORD, true)) === false) {
-    return true;
+    return password && password.length >= 6;
   }
   const strongRegex = new RegExp(/^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/, 'g');
   return strongRegex.test(password || '');

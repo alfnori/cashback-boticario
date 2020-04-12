@@ -1,2 +1,2 @@
 ##!bin/sh
-cd .. && docker-compose build
+cd .. && docker-compose build --no-cache

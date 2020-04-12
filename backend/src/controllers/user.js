@@ -1,11 +1,12 @@
 const controller = {};
 
-const { errorResponse } = require('../helpers/request');
+const { errorResponse, jsonResponse } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const {
   userTokenResponse, userErrorResponse, UserErrors,
 } = require('../helpers/request/user');
 const UserModel = require('../models/user');
+const { retriveCashbackByCPF } = require('../services/cashback');
 
 controller.authenticate = (req, res) => {
   UserModel.getUserByEmail(req.body.email, (error, user) => {
@@ -40,6 +41,12 @@ controller.currentUser = (req, res) => {
   } else {
     userErrorResponse(UserErrors.InvalidUserToken, res);
   }
+};
+
+controller.totalCashback = (req, res) => {
+  retriveCashbackByCPF(req.query.cpf, (error, data) => {
+    jsonResponse(error, { cashback: data }, res);
+  });
 };
 
 module.exports = controller;

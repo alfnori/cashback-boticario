@@ -3,36 +3,14 @@ const { validateRequest } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const { parseJSON, sanitize } = require('../utils/transformer');
 const { logRequest } = require('../utils/logger');
-const { validatorCPF, validateCode } = require('../utils/validators');
 const { statusTags } = require('../models/schemas/status');
-const { userRoles } = require('../models/schemas/user');
+const { validateCode } = require('../utils/validators');
+const { sanitizeCpf, assertMatchCPF, customOptional } = require('../helpers/middlewares');
 
 const defaultLimit = 100;
 const defaultSkip = 0;
 const defaultPage = 1;
 const minSearchLength = 3;
-
-const sanitizeCpf = (value, { req }) => {
-  const tokenCPF = req.user.cpf;
-  const defaultToToken = req.user.role === userRoles.USER;
-  const cpf = value || (defaultToToken ? tokenCPF : null);
-  if (cpf && validatorCPF.isValid(cpf)) {
-    return validatorCPF.strip(cpf);
-  }
-  return null;
-};
-
-const assertMatchCPF = (value, { req }) => {
-  const skipValidation = req.user.role === userRoles.ADMIN;
-  if (!skipValidation) {
-    if (!value) {
-      throw new Error('The field CPF must be informed.');
-    } else if (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
-      throw new Error("Informed CPF doesn't match with one in user token.");
-    }
-  }
-  return true;
-};
 
 const getAllIsValid = (req, res, next) => {
   logRequest('GET ALL PURCHASE');
@@ -54,6 +32,7 @@ const getAllValidator = (skipCPFOnQuery = false) => [
   query('filter').optional().isJSON(),
   query('search').optional().trim().isLength({ min: minSearchLength }),
   query('sort')
+    .trim()
     .customSanitizer((value) => {
       let sort = parseJSON(value);
       if (isEmptyObject(sort) && value) {
@@ -61,31 +40,34 @@ const getAllValidator = (skipCPFOnQuery = false) => [
       }
       return JSON.stringify(sort || {});
     })
-    .optional()
+    .custom(customOptional)
     .isJSON(),
   query('page')
+    .trim()
     .customSanitizer((value) => {
       let page = parseInt(value || defaultPage, 10);
       if (Number.isNaN(page) || page <= 0) page = defaultPage;
       return page;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
   query('limit')
+    .trim()
     .customSanitizer((value) => {
       let limit = parseInt(value || defaultLimit, 10);
       if (Number.isNaN(limit) || limit <= 0) limit = defaultLimit;
       return limit;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
   query('skip')
+    .trim()
     .customSanitizer((value) => {
       let skip = parseInt(value || defaultSkip, 10);
       if (Number.isNaN(skip) || skip < 0) skip = defaultSkip;
       return skip;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
 ];
 

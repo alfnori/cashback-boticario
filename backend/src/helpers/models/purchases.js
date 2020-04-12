@@ -2,11 +2,10 @@
 const { isEmptyObject } = require('../../utils/checker');
 const { logDatabase } = require('../../utils/logger');
 const {
-  parseJSON, sanitize, sanitizerEscape, transpileObject,
+  parseJSON, sanitize, transpileObject,
 } = require('../../utils/transformer');
 
-
-const mongooseRegex = (str) => ({ $regex: new RegExp(sanitizerEscape(str)), $options: 'ig' });
+const { mongooseRegex, mongooseDatex } = require('./index');
 
 const assertFilter = (config) => {
   if (!config || (!config.filter && !config.search)) return {};
@@ -16,12 +15,16 @@ const assertFilter = (config) => {
     filter = {
       code: search,
       cpf: search,
+      date: search,
     };
   } else {
     filter = parseJSON(config.filter, {});
   }
   let resultFilter = {};
   if (filter.code) resultFilter.code = mongooseRegex(filter.code);
+  if (filter.dateStart && filter.dateEnd) {
+    resultFilter.date = mongooseDatex(null, filter.dateStart, filter.dateEnd);
+  } else if (filter.date) resultFilter.date = mongooseDatex(filter.date);
   if (filter.cpf) resultFilter.cpf = mongooseRegex(filter.cpf.replace(/[^\w]/g, ''));
   if (isEmptyObject(resultFilter)) return {};
   if (search) {
@@ -38,7 +41,7 @@ const assertOrder = (config) => {
   const sort = parseJSON(config.sort);
   let resultSort = transpileObject(sort,
     (o, k, v) => {
-      const availableSort = ['name', 'document', 'department', 'employmentStatus'].indexOf(k) >= 0;
+      const availableSort = ['cpf', 'code', 'date', 'value'].indexOf(k) >= 0;
       const availableSortType = ['asc', 'desc', 'ascending', 'descending', 1, -1].indexOf(v) >= 0;
       if (availableSort && availableSortType) {
         return [k, v];

@@ -1,7 +1,6 @@
 const { assembleError, jsonResponse, errorResponse } = require('./index');
 const UserModel = require('../models/user');
 
-
 const assembleData = (userData, token = null) => {
   const user = {
     name: userData.name,

@@ -15,21 +15,6 @@ services:
       - "--bind_ip_all"
       - "--port"
       - "${DATABASE_PORT}"
-  seed:
-    build: "./db_seed"
-    volumes:
-      - "./db_seed:/data/seed"
-    networks:
-      - "cashbackBoticario"
-    depends_on:
-      - "mongo"
-    environment:
-      - "DB_HOST=mongo"
-      - "DB_PORT=${DATABASE_PORT}"
-      - "DB_NAME=${DATABASE_NAME}"
-      - "DROP_DATABASE=${DATABASE_SEED_DROP_DB}"
-      - "DROP_COLLECTIONS=${DATABASE_SEED_DROP_COLLECTION}"
-      - "REPLACE_ID=true"
   node:
     build: "./backend"
     ports:
@@ -41,7 +26,6 @@ services:
       - "./backend:/data/backend"
     depends_on:
       - "mongo"
-      - "seed"
     environment:
       - "DATABASE_URL=mongo:${DATABASE_PORT}"
       - "DATABASE_NAME=${DATABASE_NAME}"
@@ -54,6 +38,9 @@ services:
       - "JWT_EXPIRATION=$JWT_EXPIRATION"
       - "VALIDATE_CPF=$VALIDATE_CPF"
       - "STRONG_PASSWORD=$STRONG_PASSWORD"
+      - "SPECIAL_CPF=$SPECIAL_CPF"
+      - "CASHBACK_API_URL=$CASHBACK_API_URL"
+      - "CASHBACK_API_TOKEN=$CASHBACK_API_TOKEN"
   react:
     stdin_open: true
     build:
@@ -77,6 +64,22 @@ services:
       - "NETWORK_GATEWAY=${NETWORK_GATEWAY}"
       - "FRONTEND_PORT_DEV=${FRONTEND_PORT_DEV}"
       - "FRONTEND_PORT_PROD=${FRONTEND_PORT_PROD}"
+  seed:
+    build: "./db_seed"
+    volumes:
+      - "./db_seed:/data/seed"
+    networks:
+      - "cashbackBoticario"
+    depends_on:
+      - "mongo"
+      - "node"
+    environment:
+      - "DB_HOST=mongo"
+      - "DB_PORT=${DATABASE_PORT}"
+      - "DB_NAME=${DATABASE_NAME}"
+      - "DROP_DATABASE=${DATABASE_SEED_DROP_DB}"
+      - "DROP_COLLECTIONS=${DATABASE_SEED_DROP_COLLECTION}"
+      - "REPLACE_ID=true"    
 networks:
   cashbackBoticario:
     driver: bridge

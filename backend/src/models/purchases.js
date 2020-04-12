@@ -18,7 +18,7 @@ Purchases.getAllPurchases = (config, callback) => {
 };
 
 Purchases.getAllPurchasesByCPF = (cpf, config, callback) => {
-  logDatabase('QUERY: Executing findAll by CPF');
+  logDatabase(`QUERY: Executing findAll by CPF: ${cpf}`);
   Purchases.find({ cpf, ...helper.assertFilter(config) })
     .sort(helper.assertOrder(config))
     .limit(helper.assertLimit(config))
