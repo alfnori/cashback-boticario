@@ -18,8 +18,9 @@ const cashbackBoticario = axios.create({
 });
 
 const retriveCashbackByCPF = (cpf, callback) => {
-  const spripedCPF = validatorCPF.strip(cpf);
-  const byCPF = `/cashback?cpf=${spripedCPF}`;
+  logError(cpf);
+  const stripedCPF = validatorCPF.strip(cpf);
+  const byCPF = `/cashback?cpf=${stripedCPF}`;
   cashbackBoticario.get(byCPF)
     .then((res) => {
       if (res.status === 200) {

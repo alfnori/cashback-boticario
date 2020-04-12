@@ -44,7 +44,7 @@ controller.currentUser = (req, res) => {
 };
 
 controller.totalCashback = (req, res) => {
-  retriveCashbackByCPF(req.user.cpf, (error, data) => {
+  retriveCashbackByCPF(req.query.cpf, (error, data) => {
     jsonResponse(error, { cashback: data }, res);
   });
 };
