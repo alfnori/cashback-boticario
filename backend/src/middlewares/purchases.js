@@ -5,7 +5,7 @@ const { parseJSON, sanitize } = require('../utils/transformer');
 const { logRequest } = require('../utils/logger');
 const { statusTags } = require('../models/schemas/status');
 const { validateCode } = require('../utils/validators');
-const { sanitizeCpf, assertMatchCPF } = require('../helpers/middlewares/user');
+const { sanitizeCpf, assertMatchCPF, customOptional } = require('../helpers/middlewares');
 
 const defaultLimit = 100;
 const defaultSkip = 0;
@@ -32,6 +32,7 @@ const getAllValidator = (skipCPFOnQuery = false) => [
   query('filter').optional().isJSON(),
   query('search').optional().trim().isLength({ min: minSearchLength }),
   query('sort')
+    .trim()
     .customSanitizer((value) => {
       let sort = parseJSON(value);
       if (isEmptyObject(sort) && value) {
@@ -39,31 +40,34 @@ const getAllValidator = (skipCPFOnQuery = false) => [
       }
       return JSON.stringify(sort || {});
     })
-    .optional()
+    .custom(customOptional)
     .isJSON(),
   query('page')
+    .trim()
     .customSanitizer((value) => {
       let page = parseInt(value || defaultPage, 10);
       if (Number.isNaN(page) || page <= 0) page = defaultPage;
       return page;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
   query('limit')
+    .trim()
     .customSanitizer((value) => {
       let limit = parseInt(value || defaultLimit, 10);
       if (Number.isNaN(limit) || limit <= 0) limit = defaultLimit;
       return limit;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
   query('skip')
+    .trim()
     .customSanitizer((value) => {
       let skip = parseInt(value || defaultSkip, 10);
       if (Number.isNaN(skip) || skip < 0) skip = defaultSkip;
       return skip;
     })
-    .optional()
+    .custom(customOptional)
     .isInt(),
 ];
 

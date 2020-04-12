@@ -23,7 +23,10 @@ const assertMatchCPF = (value, { req }) => {
   return true;
 };
 
+const customOptional = (value, { req }) => value || req;
+
 module.exports = {
   sanitizeCpf,
   assertMatchCPF,
+  customOptional,
 };

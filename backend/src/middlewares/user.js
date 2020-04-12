@@ -1,7 +1,7 @@
 const { query, body } = require('express-validator');
 const { validateRequest } = require('../helpers/request');
 const { strongPassword } = require('../helpers/models/user');
-const { sanitizeCpf, assertMatchCPF } = require('../helpers/middlewares/user');
+const { sanitizeCpf, assertMatchCPF } = require('../helpers/middlewares');
 const { logRequest } = require('../utils/logger');
 const { validateCPF, messages } = require('../utils/validators');
 

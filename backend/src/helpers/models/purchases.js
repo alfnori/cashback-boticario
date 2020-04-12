@@ -1,42 +1,11 @@
 
-const moment = require('moment');
 const { isEmptyObject } = require('../../utils/checker');
 const { logDatabase } = require('../../utils/logger');
 const {
-  parseJSON, sanitize, sanitizerEscape, transpileObject,
+  parseJSON, sanitize, transpileObject,
 } = require('../../utils/transformer');
 
-const mongooseRegex = (str) => ({ $regex: new RegExp(sanitizerEscape(str)), $options: 'ig' });
-const mongooseDatex = (date, startDate = null, endDate = null) => {
-  const startDefault = new Date(1900, 0, 1, 0, 0, 0, 0);
-  const endDefault = new Date(2900, 0, 1, 0, 0, 0, 0);
-  let start = startDefault;
-  let end = endDefault;
-  try {
-    if (startDate && endDate) {
-      const mStart = moment(startDate);
-      const mEnd = moment(endDate);
-      if (mStart.isValid() && mEnd.isValid()) {
-        start = mStart.toDate();
-        end = mEnd.toDate();
-      }
-    } else {
-      const mDate = moment(date);
-      if (mDate.isValid()) {
-        start = mDate.startOf('day').toDate();
-        end = mDate.endOf('day').toDate();
-      }
-    }
-  } catch (err) {
-    start = null;
-    end = null;
-  }
-  if ((start === null || end === null)) {
-    start = startDefault;
-    end = endDefault;
-  }
-  return ({ $gte: start, $lt: end });
-};
+const { mongooseRegex, mongooseDatex } = require('./index');
 
 const assertFilter = (config) => {
   if (!config || (!config.filter && !config.search)) return {};
