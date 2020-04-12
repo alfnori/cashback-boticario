@@ -1,18 +1,20 @@
 const debug = require('debug');
 const e = require('./env');
 
-const DEBUG_TAG = (name) => `${(e.get(e.envs.DEBUG_TAG, 'DEBUG')).replace(':*', '')}:${name}`;
+const TAG = e.get(e.envs.DEBUG_TAG, 'DEBUG').replace(':*', '');
 
-const logger = debug(DEBUG_TAG('APP'));
-const logDatabase = debug(DEBUG_TAG('MONGO'));
-const logRequest = debug(DEBUG_TAG('REQUEST'));
-const logError = debug(DEBUG_TAG('ERROR'));
+const logger = debug(TAG);
+const logAPP = logger.extend('APP');
+const logDatabase = logger.extend('MONGO');
+const logRequest = logger.extend('REQUEST');
+const logError = logger.extend('ERROR');
 
 // eslint-disable-next-line no-console
 debug.log = console.log.bind(console);
+debug('DEBUG')('Logger enabled!');
 
 module.exports = {
-  logger,
+  logAPP,
   logDatabase,
   logRequest,
   logError,

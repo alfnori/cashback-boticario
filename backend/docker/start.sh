@@ -1,5 +1,5 @@
 #!/bin/sh
-export DEBUG_TAG=$DEBUG_TAG
+export DEBUG=$DEBUG_TAG
 export PORT=$SERVER_PORT
 export NODE_ENV=$NODE_ENV
-NODE_ENV=$NODE_ENV DEBUG_TAG=$DEBUG_TAG PORT=$PORT nodemon src/app.js
+NODE_ENV=$NODE_ENV DEBUG=$DEBUG_TAG PORT=$PORT nodemon src/app.js

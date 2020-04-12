@@ -3,36 +3,14 @@ const { validateRequest } = require('../helpers/request');
 const { isEmptyObject } = require('../utils/checker');
 const { parseJSON, sanitize } = require('../utils/transformer');
 const { logRequest } = require('../utils/logger');
-const { validatorCPF, validateCode } = require('../utils/validators');
 const { statusTags } = require('../models/schemas/status');
-const { userRoles } = require('../models/schemas/user');
+const { validateCode } = require('../utils/validators');
+const { sanitizeCpf, assertMatchCPF } = require('../helpers/middlewares/user');
 
 const defaultLimit = 100;
 const defaultSkip = 0;
 const defaultPage = 1;
 const minSearchLength = 3;
-
-const sanitizeCpf = (value, { req }) => {
-  const tokenCPF = req.user.cpf;
-  const defaultToToken = req.user.role === userRoles.USER;
-  const cpf = value || (defaultToToken ? tokenCPF : null);
-  if (cpf && validatorCPF.isValid(cpf)) {
-    return validatorCPF.strip(cpf);
-  }
-  return null;
-};
-
-const assertMatchCPF = (value, { req }) => {
-  const skipValidation = req.user.role === userRoles.ADMIN;
-  if (!skipValidation) {
-    if (!value) {
-      throw new Error('The field CPF must be informed.');
-    } else if (validatorCPF.strip(value) !== validatorCPF.strip(req.user.cpf)) {
-      throw new Error("Informed CPF doesn't match with one in user token.");
-    }
-  }
-  return true;
-};
 
 const getAllIsValid = (req, res, next) => {
   logRequest('GET ALL PURCHASE');

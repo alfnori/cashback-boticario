@@ -1,6 +1,7 @@
-const { body } = require('express-validator');
+const { query, body } = require('express-validator');
 const { validateRequest } = require('../helpers/request');
 const { strongPassword } = require('../helpers/models/user');
+const { sanitizeCpf, assertMatchCPF } = require('../helpers/middlewares/user');
 const { logRequest } = require('../utils/logger');
 const { validateCPF, messages } = require('../utils/validators');
 
@@ -55,7 +56,22 @@ const signUP = () => [
     }),
 ];
 
+const cashbackIsValid = (req, res, next) => {
+  logRequest('EXECUTING CASHBACK BY CPF');
+  logRequest(`FOR: ${req.query.cpf}`);
+  return validateRequest(req, res, next);
+};
+
+const cashback = () => [
+  query('cpf')
+    .trim()
+    .customSanitizer(sanitizeCpf)
+    .custom(assertMatchCPF),
+];
+
 module.exports = {
+  cashback,
+  cashbackIsValid,
   signIN,
   signInIsValid,
   signUP,

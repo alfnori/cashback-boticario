@@ -63,7 +63,12 @@ Authorization: Bearer {{token}}
 
 ### Get user from token
 GET {{host}}/api/user/current
-Authorization: Bearer {{token}} 
+Authorization: Bearer {{token}}
+
+
+### Get user cashback from token or query
+GET {{host}}/api/user/cashback
+Authorization: Bearer {{token}}
 
 ### Create user
 POST {{host}}/api/auth/sign/up HTTP/1.1

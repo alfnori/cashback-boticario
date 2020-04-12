@@ -23,7 +23,7 @@ Users.compareSecrets = (password, encrypted, callback) => {
 Users.generateJWT = (user) => helpers.generateJWT(user);
 
 Users.getUserByEmail = (email, callback) => {
-  logDatabase('QUERY: Executing findOne - By Email');
+  logDatabase(`QUERY: Executing findOneByEmail: ${email}`);
   Users.findOne({ email }, ['_id', 'name', 'cpf', 'email', 'role', 'password']).exec(callback);
 };
 
