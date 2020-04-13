@@ -71,8 +71,8 @@ services:
     networks:
       - "cashbackBoticario"
     depends_on:
-      - "mongo"
       - "node"
+    command: sh -c 'while ! nc -z mongo ${DATABASE_PORT}; do sleep 1; done; seed'
     environment:
       - "DB_HOST=mongo"
       - "DB_PORT=${DATABASE_PORT}"
