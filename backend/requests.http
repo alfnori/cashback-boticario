@@ -4,6 +4,7 @@
 
 @host=http://localhost:8089
 @myCPF=065.909.710-99
+@myCPF2=066.402.209-03
 @specialCPF=153.509.460-56
 
 #### STATUS
@@ -27,11 +28,11 @@ GET {{host}}/api/purchases?
 Authorization: Bearer {{specialToken}}
 
 ### Get purchases list by cpf
-GET {{host}}/api/purchases/cpf/{{specialCPF}}?sort={"date":"desc"}
+GET {{host}}/api/purchases/cpf/{{myCPF2}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}}
 
 ### Get one purchases
-GET {{host}}/api/purchases/5e8f830cc1ce9f00dcb8f68d
+GET {{host}}/api/purchases/5e973de8ad43b701b9026250
 Authorization: Bearer {{specialToken}}
 
 ### Create purchases
@@ -40,10 +41,10 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC1234003",
+    "code": "ABC123456G",
     "cpf": "066.402.209-03",
-    "date": "2020-04-05T03:00:00.000Z",
-    "value": 4444.44
+    "date": "2020-02-05T03:00:00.000Z",
+    "value": 3333.33
 }
 
 ### Update purchases

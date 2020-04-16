@@ -19,8 +19,8 @@ const mongooseDatex = (date, startDate = null, endDate = null) => {
     } else {
       const mDate = moment(date);
       if (mDate.isValid()) {
-        start = mDate.startOf('day').toDate();
-        end = mDate.endOf('day').toDate();
+        start = mDate.clone().startOf('day').toDate();
+        end = mDate.clone().endOf('day').toDate();
       }
     }
   } catch (err) {

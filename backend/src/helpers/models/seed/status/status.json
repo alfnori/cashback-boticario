@@ -1,0 +1,20 @@
+[
+    {
+        "_id": "5e1b2b29d9c96d08e36ee2dc",
+        "name": "Em validação",
+        "tag": "EV",
+        "order": 1
+    },
+    {
+        "_id": "5e1b2b29d9c96d4e946ee2dd",
+        "name": "Reprovado",
+        "tag": "RE",
+        "order": 2
+    },
+    {
+        "_id": "5e1b2b29d9c96d0af46ee2de",
+        "name": "Aprovado",
+        "tag": "AP",
+        "order": 3
+    }
+]

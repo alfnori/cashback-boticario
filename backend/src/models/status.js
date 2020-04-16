@@ -9,4 +9,12 @@ Status.findByTag = (tag, callback) => {
   Status.findOne({ tag }).exec(callback);
 };
 
+Status.findByTagAsync = (tag) => new Promise((resolve, reject) => {
+  const callback = (error, status) => {
+    if (error) reject(error);
+    else resolve(status);
+  };
+  Status.findByTag(tag, callback);
+});
+
 module.exports = Status;

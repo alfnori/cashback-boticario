@@ -2,10 +2,12 @@
 const mongoose = require('mongoose');
 const { logDatabase, logError } = require('../utils/logger');
 const { envs, get } = require('../utils/env');
+const seedStatus = require('../helpers/models/seed/status/status');
 
 // Enviroment variables
 const DATABASE_URL = get(envs.DATABASE_URL, '0.0.0.0:27017');
 const DATABASE_NAME = get(envs.DATABASE_NAME, 'cashbackBoticario');
+const willSeedStatus = Boolean(get(envs.SEED_STATUS, true));
 
 const init = () => {
   mongoose.set('useUnifiedTopology', true);
@@ -36,6 +38,9 @@ const init = () => {
   // On open execute
   db.once('open', () => {
     logDatabase('Connection Succeeded!');
+    if (willSeedStatus) {
+      seedStatus();
+    }
   });
 
   return db;
