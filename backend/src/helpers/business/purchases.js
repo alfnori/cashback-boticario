@@ -1,9 +1,7 @@
 const moment = require('moment');
 const cashback = require('./cashbackRule');
-const { logError } = require('../../utils/logger');
-const { statusTags } = require('../../models/schemas/status');
-const Purchases = require('../../models/purchases');
-const Status = require('../../models/status');
+// const { logError } = require('../../utils/logger');
+const { isBeforeDate } = require('../../utils/checker');
 
 const getCurrentRule = cashback.rule();
 
@@ -71,52 +69,32 @@ const calculateBonification = (rule, valueAccumulated, purchaseValue) => {
   return { value, bonus, bonusType };
 };
 
-const calculateCashback = async (purchase, rule = getCurrentRule) => {
+const calculateCashback = (purchasesInRange, purchase, rule = getCurrentRule) => {
   let cashbackData = { value: null, bonus: null, bonusType: null };
-  const { cpf, date, value } = purchase;
-  const { startDate, endDate } = calculateDateRange(rule, date);
-  try {
-    const purchasesInRange = await Purchases.getPurchasesInPeriod(cpf, startDate, endDate);
-    if (purchasesInRange && purchasesInRange.length > 0) {
-      const reducerValues = (acc, curr) => curr.value + acc;
-      const valueAccumulated = purchasesInRange.reduce(reducerValues, 0);
-      cashbackData = calculateBonification(rule, valueAccumulated, value);
-    }
-  } catch (error) {
-    logError(error);
-    throw error;
+  const { value } = purchase;
+  if (purchasesInRange && purchasesInRange.length > 0) {
+    const reducerValues = (acc, curr) => curr.value + acc;
+    const valueAccumulated = purchasesInRange.reduce(reducerValues, 0);
+    cashbackData = calculateBonification(rule, valueAccumulated, value);
   }
   return cashbackData;
 };
 
-const assertCashbackFromMonth = async (cpf, date, rule = getCurrentRule) => {
-  const mDate = moment(date);
-  if (!mDate || !mDate.isValid()) {
-    throw new Error('Invalid date provided!');
+const calculateCashbackInMonth = (purchasesInRange, rule = getCurrentRule) => {
+  let assertedCashbacks = [];
+  if (purchasesInRange && purchasesInRange.length > 0) {
+    assertedCashbacks = purchasesInRange.map((purchase) => {
+      const purchasesBefore = purchasesInRange.filter((p) => isBeforeDate(purchase.date, p.date));
+      const cashbackData = calculateCashback(purchasesBefore, purchase, rule);
+      const purchaseWithCashback = { ...purchase, cashback: cashbackData };
+      return purchaseWithCashback;
+    });
   }
-  const startDate = mDate.clone().startOf('month').toDate();
-  const endDate = mDate.clone().endOf('month').toDate();
-  const inValidationStatus = await Status.findByTagAsync(statusTags.EmValidacao);
-  const filter = { status: inValidationStatus.id };
-  try {
-    const purchasesInRange = await Purchases
-      .getPurchasesInPeriod(cpf, startDate, endDate, filter);
-    if (purchasesInRange && purchasesInRange.length > 0) {
-      await Promise.all(
-        purchasesInRange.map(async (purchase) => {
-          const cashbackData = await calculateCashback(purchase, rule);
-          await Purchases
-            .findByIdAndUpdate(purchase.id, { cashback: cashbackData });
-        }),
-      );
-    }
-  } catch (error) {
-    logError(error);
-    throw error;
-  }
+  return assertedCashbacks;
 };
 
 module.exports = {
+  calculateDateRange,
   calculateCashback,
-  assertCashbackFromMonth,
+  calculateCashbackInMonth,
 };

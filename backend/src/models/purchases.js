@@ -42,7 +42,7 @@ PurchasesSchema.statics.updatePurchase = function upd(id, data, callback) {
       let cashback = { ...data.cashback };
       if (!cashback) {
         try {
-          cashback = await calculateCashback(toUpdate);
+          cashback = {}; // TODO await calculateCashback(toUpdate);
           updateData = { ...data, cashback };
         } catch (err) {
           logError('Failed to save cashback info.');
@@ -62,7 +62,7 @@ PurchasesSchema.statics.createPurchase = function crt(data, callback) {
     if (error) callback(error);
     else if (!created.cashback) {
       try {
-        const cashback = await calculateCashback(created);
+        const cashback = {}; // TODO await calculateCashback(created);
         PurchasesSchema.updatePurchase(created.id, { cashback }, callback);
       } catch (err) {
         logError('Failed to save cashback info.');
@@ -79,9 +79,8 @@ PurchasesSchema.statics.deletePurchase = function del(id, callback) {
   this.findByIdAndDelete(id).exec(callback);
 };
 
-PurchasesSchema.statics.getPurchasesInPeriod = async function gpip(
-  cpf, startDate, endDate, filters = {},
-) {
+PurchasesSchema.statics.getPurchasesInPeriod = async function
+gpip(startDate, endDate, cpf = null, filters = {}) {
   logDatabase('MODEL: Get all purchases from day month start to date');
   const mStart = moment(startDate);
   const mEnd = moment(endDate);
@@ -89,7 +88,12 @@ PurchasesSchema.statics.getPurchasesInPeriod = async function gpip(
     throw new Error('The given date was invalid!');
   }
   const period = mongooseDatex(null, mStart.toDate(), mEnd.toDate());
-  const queryFilters = { cpf, date: period, ...filters };
+  // const statusFilter = filters.status || {};
+  const queryFilters = { date: period, ...filters };
+  delete queryFilters.status;
+  if (cpf) {
+    queryFilters.cpf = cpf;
+  }
   let purchases;
   try {
     purchases = await this.find(queryFilters).populate('status');
@@ -99,4 +103,24 @@ PurchasesSchema.statics.getPurchasesInPeriod = async function gpip(
   return purchases;
 };
 
-module.exports = mongoose.model('Purchases', PurchasesSchema);
+PurchasesSchema.statics.getPurchasesInMonthByStatus = async function
+gpin(date, statusTag, cpf = null) {
+  logDatabase('MODEL: Get all purchases from month and status');
+  const mDate = moment(date);
+  if (!mDate || !mDate.isValid()) {
+    throw new Error('The given date was invalid!');
+  }
+  const startDate = mDate.clone().startOf('month').toDate();
+  const endDate = mDate.clone().endOf('month').toDate();
+  const statusFilter = { status: { tag: { $in: [statusTag] } } };
+  let purchases;
+  try {
+    purchases = await this.getPurchasesInPeriod(startDate, endDate, cpf, statusFilter);
+  } catch (error) {
+    purchases = [];
+  }
+  return purchases;
+};
+
+const Purchases = mongoose.model('Purchases', PurchasesSchema);
+module.exports = Purchases;

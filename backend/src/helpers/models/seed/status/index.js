@@ -1,10 +1,11 @@
 /* eslint-disable no-underscore-dangle */
+
 const Status = require('../../../../models/status');
 const { logError, logDatabase } = require('../../../../utils/logger');
 const defaultData = require('./status.json');
+const { get, envs } = require('../../../../utils/env');
 
 const requiredTags = defaultData.map((s) => s.tag);
-
 
 const assertTag = async (tag) => {
   try {
@@ -30,5 +31,8 @@ const assertStatus = async (assertTags) => {
 };
 
 module.exports = async () => {
-  await assertStatus(requiredTags);
+  const willSeed = Boolean(get(envs.SEED_STATUS, true));
+  if (willSeed) {
+    await assertStatus(requiredTags);
+  }
 };
