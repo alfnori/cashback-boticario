@@ -2,6 +2,8 @@
 
 const calc = require('./cashback/calculates');
 const { getRule } = require('./cashback/rules');
+const { trigger, eventTypes } = require('../../events/attach');
+const { logAPP } = require('../../utils/logger');
 
 class PurchaseNCashback {
   constructor(purchaseModel, purchase, rule = null) {
@@ -51,6 +53,12 @@ class PurchaseNCashback {
       await this.init();
     }
     return this._cashback;
+  }
+
+  callEvent() {
+    const { date, cpf } = this._purchase;
+    logAPP('Calling UPDATED_PURCHASE event');
+    trigger(eventTypes.UPDATED_PURCHASE, this._model, date, cpf);
   }
 }
 

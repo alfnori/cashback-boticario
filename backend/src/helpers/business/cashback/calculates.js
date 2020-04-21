@@ -87,7 +87,7 @@ const calculateCashbackInMonth = (purchasesInRange, rules = getCurrentRule) => {
     assertedCashbacks = purchasesInRange.map((purchase) => {
       const purchasesBefore = purchasesInRange.filter((p) => isBeforeDate(p.date, purchase.date));
       const cashbackData = calculateCashback(purchasesBefore, purchase, rules);
-      const purchaseWithCashback = { ...purchase, cashback: cashbackData };
+      const purchaseWithCashback = { ...purchase.toObject(), cashback: cashbackData };
       return purchaseWithCashback;
     });
   }

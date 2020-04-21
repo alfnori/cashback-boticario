@@ -5,6 +5,8 @@ const userRoutes = require('./user');
 const misc = require('../controllers/misc');
 const { notFoundResponse } = require('../helpers/request');
 
+// TODO Use an cache like Redis
+global.rootReached = 0;
 
 const init = (app) => {
   app.get('/', misc.welcome);
