@@ -2,9 +2,13 @@ const app = require('express')();
 const database = require('./models/mongoose');
 const router = require('./routes');
 const middleware = require('./middlewares');
+const events = require('./events/attach');
 const { envs, get, print } = require('./utils/env');
 
-global.rootReached = 0;
+const port = get(envs.PORT, 8081);
+
+// LOADED ENV PRINT
+print();
 
 // DB Setup
 database();
@@ -15,8 +19,8 @@ middleware(app);
 // ROUTER
 router(app);
 
-// LISTEN
-app.listen(get(envs.PORT, 8081));
+// EVENT LISTEN
+events.init();
 
-// LOADED ENV
-print();
+// EXPRESS LISTEN
+app.listen(port);

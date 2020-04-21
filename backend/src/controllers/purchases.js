@@ -29,13 +29,15 @@ controller.getAllPurchasesByCPF = (req, res) => {
     (error, purchases) => jsonResponse(error, { purchases }, res));
 };
 
-controller.getOnePurchases = (req, res) => {
+controller.getOnePurchase = async (req, res) => {
   const { id } = req.params;
   const { cpf, role } = req.user;
-  Purchases.getOnePurchases(id,
-    (error, purchase) => {
+  Purchases.getOnePurchase(id,
+    async (error, purchase) => {
       if (error) {
         errorResponse(error, res);
+      } else if (!purchase) {
+        jsonResponse(null, { purchase }, res);
       } else {
         const userPurchase = validateUserPurchase(purchase, role, cpf);
         if (!userPurchase) {
@@ -47,22 +49,18 @@ controller.getOnePurchases = (req, res) => {
     });
 };
 
-controller.createPurchases = (req, res, next) => {
+controller.createPurchase = (req, res) => {
   const { body } = req;
-  newPurchaseData(body, (err, newPurchase) => {
-    if (err) next(err);
-    else {
-      Purchases.createPurchases(newPurchase, (error, created) => {
-        jsonResponse(error, { purchase: created }, res);
-      });
-    }
+  const newPurchase = newPurchaseData(body);
+  Purchases.createPurchase(newPurchase, (error, created) => {
+    jsonResponse(error, { purchase: created }, res);
   });
 };
 
-controller.updatePurchases = (req, res) => {
+controller.updatePurchase = (req, res) => {
   const { id } = req.params;
   const { cpf, role } = req.user;
-  Purchases.getOnePurchases(id, (error, purchase) => {
+  Purchases.getOnePurchase(id, (error, purchase) => {
     if (error) {
       errorResponse(error, res);
     } else {
@@ -74,7 +72,7 @@ controller.updatePurchases = (req, res) => {
       } else {
         const { body } = req;
         const updateFields = { date: body.date, value: body.value };
-        Purchases.updatePurchases(id, updateFields, (err, updated) => {
+        Purchases.updatePurchase(id, updateFields, (err, updated) => {
           jsonResponse(err, { purchase: updated }, res);
         });
       }
@@ -82,10 +80,10 @@ controller.updatePurchases = (req, res) => {
   });
 };
 
-controller.deletePurchases = (req, res) => {
+controller.deletePurchase = (req, res) => {
   const { id } = req.params;
   const { cpf, role } = req.user;
-  Purchases.getOnePurchases(id, (error, purchase) => {
+  Purchases.getOnePurchase(id, (error, purchase) => {
     if (error) {
       errorResponse(error, res);
     } else {
@@ -95,7 +93,7 @@ controller.deletePurchases = (req, res) => {
       } else if (!purchase.status || (purchase.status.tag !== statusTags.EmValidacao)) {
         purchaseErrorResponse(PurchaseErrors.CantDeleteNotEV, res);
       } else {
-        Purchases.deletePurchases(id, (dError, deleted) => {
+        Purchases.deletePurchase(id, (dError, deleted) => {
           const isDeleted = deleted && !isEmptyObject(deleted);
           jsonResponse(dError, { deleted: isDeleted || false }, res);
         });

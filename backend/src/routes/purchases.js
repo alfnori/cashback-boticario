@@ -31,7 +31,7 @@ purchasesRouter.get('/:id',
   middleware.idIsValid,
   handleError(async (req, res, next) => {
     logRequest('GET ONE PURCHASE');
-    controller.getOnePurchases(req, res, next);
+    controller.getOnePurchase(req, res, next);
   }));
 
 purchasesRouter.post('/create',
@@ -39,7 +39,7 @@ purchasesRouter.post('/create',
   middleware.oneIsValid,
   handleError(async (req, res, next) => {
     logRequest('CREATE ONE PURCHASE');
-    controller.createPurchases(req, res, next);
+    controller.createPurchase(req, res, next);
   }));
 
 purchasesRouter.put('/update/:id',
@@ -49,7 +49,7 @@ purchasesRouter.put('/update/:id',
   middleware.oneIsValid,
   handleError(async (req, res, next) => {
     logRequest('UPDATE ONE PURCHASE');
-    controller.updatePurchases(req, res, next);
+    controller.updatePurchase(req, res, next);
   }));
 
 purchasesRouter.delete('/delete/:id',
@@ -57,7 +57,7 @@ purchasesRouter.delete('/delete/:id',
   middleware.idIsValid,
   handleError(async (req, res, next) => {
     logRequest('DELETE AN PURCHASE');
-    controller.deletePurchases(req, res, next);
+    controller.deletePurchase(req, res, next);
   }));
 
 module.exports = purchasesRouter;

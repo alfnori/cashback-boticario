@@ -15,7 +15,6 @@ const assertFilter = (config) => {
     filter = {
       code: search,
       cpf: search,
-      date: search,
     };
   } else {
     filter = parseJSON(config.filter, {});
@@ -23,8 +22,16 @@ const assertFilter = (config) => {
   let resultFilter = {};
   if (filter.code) resultFilter.code = mongooseRegex(filter.code);
   if (filter.dateStart && filter.dateEnd) {
-    resultFilter.date = mongooseDatex(null, filter.dateStart, filter.dateEnd);
-  } else if (filter.date) resultFilter.date = mongooseDatex(filter.date);
+    const dtx = mongooseDatex(null, filter.dateStart, filter.dateEnd, true);
+    if (dtx) {
+      resultFilter.date = dtx;
+    }
+  } else if (filter.date) {
+    const dtx = mongooseDatex(filter.date, null, null, true);
+    if (dtx) {
+      resultFilter.date = dtx;
+    }
+  }
   if (filter.cpf) resultFilter.cpf = mongooseRegex(filter.cpf.replace(/[^\w]/g, ''));
   if (isEmptyObject(resultFilter)) return {};
   if (search) {

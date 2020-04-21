@@ -41,6 +41,25 @@ const PurchasesSchema = new Schema({
     type: ObjectId,
     ref: 'Status',
   },
+  cashback: {
+    required: false,
+    type: {
+      value: {
+        required: true,
+        type: Number,
+        min: 0,
+      },
+      bonus: {
+        required: true,
+        type: Number,
+        min: 0,
+      },
+      bonusType: {
+        required: true,
+        type: String,
+      },
+    },
+  },
 });
 
 // CPF Getters & Setters

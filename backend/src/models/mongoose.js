@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const { logDatabase, logError } = require('../utils/logger');
 const { envs, get } = require('../utils/env');
+const seedStatus = require('../helpers/models/seed/status');
+const Status = require('./status');
 
 // Enviroment variables
 const DATABASE_URL = get(envs.DATABASE_URL, '0.0.0.0:27017');
@@ -34,8 +36,10 @@ const init = () => {
   });
 
   // On open execute
-  db.once('open', () => {
+  db.once('open', async () => {
     logDatabase('Connection Succeeded!');
+    await seedStatus();
+    await Status.initCache();
   });
 
   return db;
