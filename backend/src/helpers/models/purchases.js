@@ -15,7 +15,6 @@ const assertFilter = (config) => {
     filter = {
       code: search,
       cpf: search,
-      date: search,
     };
   } else {
     filter = parseJSON(config.filter, {});

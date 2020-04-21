@@ -1,100 +1,57 @@
-const moment = require('moment');
-const cashback = require('./cashbackRule');
-// const { logError } = require('../../utils/logger');
-const { isBeforeDate } = require('../../utils/checker');
+/* eslint-disable no-underscore-dangle */
 
-const getCurrentRule = cashback.rule();
+const calc = require('./cashback/calculates');
+const { getRule } = require('./cashback/rules');
 
-const calculateDateRange = (currentRule, purchaseDate) => {
-  const mPurchaseDate = moment(purchaseDate);
-  if (!mPurchaseDate || !mPurchaseDate.isValid()) {
-    throw new Error('Invalid date provided!');
+class PurchaseNCashback {
+  constructor(purchaseModel, purchase, rule = null) {
+    this._rule = rule || getRule();
+    this._model = purchaseModel;
+    this._purchase = purchase;
+    this._dates = {
+      start: null,
+      end: null,
+    };
+    this._purchasesBefore = [];
+    this._cashback = null;
   }
-  let startDate = mPurchaseDate.clone().startOf('day');
-  let endDate = mPurchaseDate.clone().endOf('day');
-  const { periodTypes } = cashback;
-  switch (currentRule.periodType) {
-    case periodTypes.MONTH_UNTIL_DATE:
-      startDate = mPurchaseDate.startOf('month').toDate();
-      break;
-    case periodTypes.LAST_PERIOD: {
-      const { range, rangeType } = currentRule.period;
-      startDate = mPurchaseDate.subtract(range, rangeType);
-      break;
+
+  _calculdateDates() {
+    const range = calc.calculateDateRange(this._purchase.date, this._rule);
+    this._dates = {
+      start: range.startDate,
+      end: range.endDate,
+    };
+  }
+
+  async _retrivePreviousPurchases() {
+    const { cpf } = this._purchase;
+    if (!this._dates.start || !this._dates.end) {
+      this._calculdateDates();
     }
-    default:
-      startDate = startDate.toDate();
-      endDate = endDate.toDate();
-      break;
+    const { start, end } = this._dates;
+    const purchases = await this._model.getPurchasesInPeriod(start, end, cpf);
+    this._purchasesBefore = purchases;
   }
-  return {
-    startDate,
-    endDate,
-  };
-};
 
-const calculateBonus = (bonus, bonusType, purchaseValue) => {
-  switch (bonusType) {
-    case cashback.bonusType.BRUTE:
-      return bonus;
-    case cashback.bonusType.PERCENTAGE:
-      return purchaseValue * bonus;
-    default:
-      return 0;
+  _calculateCashback() {
+    const { _purchasesBefore, _purchase, _rule } = this;
+    const cashback = calc.calculateCashback(_purchasesBefore, _purchase, _rule);
+    this._cashback = cashback;
   }
-};
 
-const calculateRangeBonus = (cashbackRules, valueAccumulated) => {
-  let rangeBonus = { bonus: null, bonusType: null };
-  for (let index = 0; index < cashbackRules.length; index += 1) {
-    const range = cashbackRules[index];
-    const {
-      min, max, bonus, bonusType,
-    } = range;
-    if (
-      (min === -1 && valueAccumulated <= max)
-      || (max === -1 && valueAccumulated > min)
-      || (min > -1 && max >= min && valueAccumulated > min && valueAccumulated <= max)
-    ) {
-      rangeBonus = { bonus, bonusType };
-      break;
+  async init() {
+    this._calculdateDates();
+    await this._retrivePreviousPurchases();
+    this._calculateCashback();
+  }
+
+  async getCashBack() {
+    if (!this._cashback) {
+      await this.init();
     }
+    return this._cashback;
   }
-  return rangeBonus;
-};
+}
 
-const calculateBonification = (rule, valueAccumulated, purchaseValue) => {
-  const { bonus, bonusType } = calculateRangeBonus(rule, valueAccumulated);
-  const value = calculateBonus(bonus, bonusType, purchaseValue);
-  return { value, bonus, bonusType };
-};
-
-const calculateCashback = (purchasesInRange, purchase, rule = getCurrentRule) => {
-  let cashbackData = { value: null, bonus: null, bonusType: null };
-  const { value } = purchase;
-  if (purchasesInRange && purchasesInRange.length > 0) {
-    const reducerValues = (acc, curr) => curr.value + acc;
-    const valueAccumulated = purchasesInRange.reduce(reducerValues, 0);
-    cashbackData = calculateBonification(rule, valueAccumulated, value);
-  }
-  return cashbackData;
-};
-
-const calculateCashbackInMonth = (purchasesInRange, rule = getCurrentRule) => {
-  let assertedCashbacks = [];
-  if (purchasesInRange && purchasesInRange.length > 0) {
-    assertedCashbacks = purchasesInRange.map((purchase) => {
-      const purchasesBefore = purchasesInRange.filter((p) => isBeforeDate(purchase.date, p.date));
-      const cashbackData = calculateCashback(purchasesBefore, purchase, rule);
-      const purchaseWithCashback = { ...purchase, cashback: cashbackData };
-      return purchaseWithCashback;
-    });
-  }
-  return assertedCashbacks;
-};
-
-module.exports = {
-  calculateDateRange,
-  calculateCashback,
-  calculateCashbackInMonth,
-};
+module.exports = PurchaseNCashback;

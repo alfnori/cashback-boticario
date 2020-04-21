@@ -14,8 +14,8 @@
  ==================================================================
 */
 
-const { get, envs } = require('../../utils/env');
-const { parseJSON } = require('../../utils/transformer');
+const { get, envs } = require('../../../utils/env');
+const { parseJSON } = require('../../../utils/transformer');
 
 const PERIOD_TYPES = {
   MONTH_UNTIL_DATE: 'MONTH_UNTIL_DATE',
@@ -76,7 +76,7 @@ const getCashbackRules = () => {
 };
 
 module.exports = {
-  rule: getCashbackRules,
+  getRule: getCashbackRules,
   periodTypes: PERIOD_TYPES,
   bonusType: BONUS_TYPE,
 };

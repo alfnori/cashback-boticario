@@ -10,7 +10,6 @@ const { isEmptyObject } = require('../utils/checker');
 const { userRoles } = require('../models/schemas/user');
 const { statusTags } = require('../models/schemas/status');
 const Purchases = require('../models/purchases');
-// const { calculateCashback, assertCashbackFromMonth } = require('../helpers/business/purchases');
 
 controller.getAllPurchases = (req, res) => {
   const { cpf } = req.query;
@@ -44,16 +43,13 @@ controller.getOnePurchase = async (req, res) => {
         if (!userPurchase) {
           purchaseErrorResponse(PurchaseErrors.NotOwnerOrAdmin, res);
         } else {
-          const purchases = await Purchases
-            .getPurchasesInMonthByStatus(purchase.date, statusTags.Aprovado);
-          jsonResponse(null, { purchases }, res);
-          // jsonResponse(null, { purchase }, res);
+          jsonResponse(null, { purchase }, res);
         }
       }
     });
 };
 
-controller.createPurchase = (req, res, next) => {
+controller.createPurchase = (req, res) => {
   const { body } = req;
   const newPurchase = newPurchaseData(body);
   Purchases.createPurchase(newPurchase, (error, created) => {

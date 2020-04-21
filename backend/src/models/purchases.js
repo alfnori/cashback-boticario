@@ -4,8 +4,10 @@ const moment = require('moment');
 const PurchasesSchema = require('./schemas/purchases');
 const helper = require('../helpers/models/purchases');
 const { mongooseDatex } = require('../helpers/models');
-const { calculateCashback } = require('../helpers/business/purchases');
+const PurchaseNCashback = require('../helpers/business/purchases');
+const StatusModel = require('./status');
 const { logDatabase, logError } = require('../utils/logger');
+const { isEmptyObject } = require('../utils/checker');
 
 // Methods
 PurchasesSchema.statics.getAllPurchases = function gap(config, callback) {
@@ -36,13 +38,19 @@ PurchasesSchema.statics.getOnePurchase = function gop(id, callback) {
 PurchasesSchema.statics.updatePurchase = function upd(id, data, callback) {
   logDatabase('MODEL: Executing update');
   let updateData = { ...data };
-  this.findById(id, async (error, toUpdate) => {
+  this.findById(id, async (error, found) => {
     if (error) callback(error);
     else {
       let cashback = { ...data.cashback };
-      if (!cashback) {
+      if (isEmptyObject(cashback)) {
         try {
-          cashback = {}; // TODO await calculateCashback(toUpdate);
+          const update = {
+            ...found.toObject(),
+            value: data.value || found.value,
+            date: data.data || found.date,
+          };
+          const nCash = new PurchaseNCashback(this, update);
+          cashback = await nCash.getCashBack();
           updateData = { ...data, cashback };
         } catch (err) {
           logError('Failed to save cashback info.');
@@ -60,10 +68,11 @@ PurchasesSchema.statics.createPurchase = function crt(data, callback) {
   logDatabase('MODEL: Executing create');
   this.create(data, async (error, created) => {
     if (error) callback(error);
-    else if (!created.cashback) {
+    else if (isEmptyObject(created.cashback)) {
       try {
-        const cashback = {}; // TODO await calculateCashback(created);
-        PurchasesSchema.updatePurchase(created.id, { cashback }, callback);
+        const nCash = new PurchaseNCashback(this, created);
+        const cashback = await nCash.getCashBack();
+        this.updatePurchase(created.id, { cashback }, callback);
       } catch (err) {
         logError('Failed to save cashback info.');
         logError(err);
@@ -88,9 +97,7 @@ gpip(startDate, endDate, cpf = null, filters = {}) {
     throw new Error('The given date was invalid!');
   }
   const period = mongooseDatex(null, mStart.toDate(), mEnd.toDate());
-  // const statusFilter = filters.status || {};
   const queryFilters = { date: period, ...filters };
-  delete queryFilters.status;
   if (cpf) {
     queryFilters.cpf = cpf;
   }
@@ -112,7 +119,8 @@ gpin(date, statusTag, cpf = null) {
   }
   const startDate = mDate.clone().startOf('month').toDate();
   const endDate = mDate.clone().endOf('month').toDate();
-  const statusFilter = { status: { tag: { $in: [statusTag] } } };
+  const status = StatusModel.findByTag(statusTag);
+  const statusFilter = { status };
   let purchases;
   try {
     purchases = await this.getPurchasesInPeriod(startDate, endDate, cpf, statusFilter);

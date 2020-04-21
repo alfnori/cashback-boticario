@@ -6,7 +6,6 @@ const { envs, get, print } = require('./utils/env');
 
 // TODO Use an cache like Redis
 global.rootReached = 0;
-global.statusItems = [];
 
 // DB Setup
 database();

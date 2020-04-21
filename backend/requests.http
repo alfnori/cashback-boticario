@@ -22,9 +22,10 @@ Authorization: Bearer {{token}}
 
 ### Get purchases list
 ###filter={"code": "XYZ"}&search=056
+###search=ABC123456N
 ###filter={"date": "2020-04-05T03:00:00.000Z"}
 ###sort={"date": "desc", "value": "desc"}
-GET {{host}}/api/purchases?search=ABC123456N
+GET {{host}}/api/purchases?search=ABC1234XXX&sort={"date": "asc", "value": "desc"}
 Authorization: Bearer {{specialToken}}
 
 ### Get purchases list by cpf
@@ -32,7 +33,7 @@ GET {{host}}/api/purchases/cpf/{{myCPF2}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}}
 
 ### Get one purchases
-GET {{host}}/api/purchases/5e973de8ad43b701b9026250
+GET {{host}}/api/purchases/5e9e3b2ec2435c00f3758f50
 Authorization: Bearer {{specialToken}}
 
 ### Create purchases
@@ -41,20 +42,20 @@ Authorization: Bearer {{specialToken}}
 content-type: application/json
 
 {
-    "code": "ABC123456N",
-    "cpf": "061.185.729-41",
+    "code": "ABC1234XXX",
+    "cpf": "{{myCPF2}}",
     "date": "2020-02-05T03:00:00.000Z",
-    "value": 333.33
+    "value": 3.33
 }
 
 ### Update purchases
-PUT {{host}}/api/purchases/update/5e8f992787492403abec982b HTTP/1.1
+PUT {{host}}/api/purchases/update/5e9e43c936b31401bbdc6774 HTTP/1.1
 Authorization: Bearer {{specialToken}} 
 content-type: application/json
 
 {
-    "date": "2020-04-04T03:00:00.000Z",
-    "value": 1234.55
+    "date": "2020-02-05T03:00:00.000Z",
+    "value": 1000.00
 }
 
 ### Delete purchases
