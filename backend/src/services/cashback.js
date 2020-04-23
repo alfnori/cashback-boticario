@@ -17,6 +17,20 @@ const cashbackBoticario = axios.create({
   },
 });
 
+/**
+ * Callback to receive value from external API
+ * @typedef {import('../utils/transformer.js').RequestError} RequestError
+ * @callback cashbackCallback
+ * @param {Error|RequestError} error A possible error
+ * @param {*} data A result value
+ */
+
+/**
+ * Tries to retrive cashback information from Boticario's API
+ *
+ * @param {String} cpf An valid CPF to be matched
+ * @param {cashbackCallback} callback An callback to send result
+ */
 const retriveCashbackByCPF = (cpf, callback) => {
   logError(cpf);
   const stripedCPF = validatorCPF.strip(cpf);

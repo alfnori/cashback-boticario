@@ -1,3 +1,8 @@
+/**
+ * @classdesc Users controller
+ * @name ControllerUsers
+ * @class
+ */
 const controller = {};
 
 const { errorResponse, jsonResponse } = require('../helpers/request');
@@ -8,6 +13,13 @@ const {
 const UserModel = require('../models/user');
 const { retriveCashbackByCPF } = require('../services/cashback');
 
+/**
+ * Authenticate method - Authenticates an user to receive new token
+ * @method
+ * @name authenticate
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.authenticate = (req, res) => {
   UserModel.getUserByEmail(req.body.email, (error, user) => {
     if (error || !user || !user.password) {
@@ -24,6 +36,13 @@ controller.authenticate = (req, res) => {
   });
 };
 
+/**
+ * Register method - Creates a new user
+ * @method
+ * @name register
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.register = (req, res) => {
   try {
     UserModel.createUser(req.body, (error, user) => {
@@ -35,6 +54,13 @@ controller.register = (req, res) => {
   }
 };
 
+/**
+ * CurrentUser method - Returns current user from token
+ * @method
+ * @name currentUser
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.currentUser = (req, res) => {
   if (!isEmptyObject(req.user)) {
     userTokenResponse(req.user, res);
@@ -43,6 +69,13 @@ controller.currentUser = (req, res) => {
   }
 };
 
+/**
+ * TotalCashback method - Retrives accumulated Cashback by CPF
+ * @method
+ * @name totalCashback
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.totalCashback = (req, res) => {
   retriveCashbackByCPF(req.query.cpf, (error, data) => {
     jsonResponse(error, { cashback: data }, res);

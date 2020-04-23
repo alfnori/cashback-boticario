@@ -1,5 +1,10 @@
 const express = require('express');
 
+/**
+ * @classdesc Authentication Router
+ * @name RouterAuthentication
+ * @class
+ */
 const authRouter = express.Router();
 
 const middleware = require('../middlewares/user');
@@ -8,6 +13,9 @@ const { logRequest } = require('../utils/logger');
 
 const controller = require('../controllers/user');
 
+/**
+ * @name signIN Signs in an user
+*/
 authRouter.post('/sign/in',
   middleware.signIN(),
   middleware.signInIsValid,
@@ -16,6 +24,10 @@ authRouter.post('/sign/in',
     controller.authenticate(req, res, next);
   }));
 
+
+/**
+ * @name signUP Signs up an user
+*/
 authRouter.post('/sign/up',
   middleware.signUP(),
   middleware.signUpIsValid,

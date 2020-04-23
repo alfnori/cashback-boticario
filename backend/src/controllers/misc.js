@@ -1,8 +1,20 @@
+/**
+ * @classdesc Misc controller
+ * @name ControllerMisc
+ * @class
+ */
 const controller = {};
 
 const { jsonResponse, httpResponse } = require('../helpers/request');
 const { logRequest } = require('../utils/logger');
 
+/**
+ * Welcome method - Display simple page with counter access
+ * @method
+ * @name welcome
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.welcome = (req, res) => {
   global.rootReached += 1;
   logRequest(`/ reached ${global.rootReached} times!`);
@@ -29,6 +41,14 @@ controller.welcome = (req, res) => {
   httpResponse(data, res);
 };
 
+
+/**
+ * Counter method - Sends counter access
+ * @method
+ * @name counter
+ * @param {Request} req Router Request
+ * @param {Response} res Router Response
+*/
 controller.counter = (req, res) => {
   global.rootReached += 1;
   jsonResponse(null, { counter: global.rootReached }, res);

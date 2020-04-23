@@ -8,6 +8,10 @@ const { notFoundResponse } = require('../helpers/request');
 // TODO Use an cache like Redis
 global.rootReached = 0;
 
+/**
+ * Initializes Express Routes
+ * @param {Express.Application} app The express Application
+ */
 const init = (app) => {
   app.get('/', misc.welcome);
   app.get('/public/counter', misc.counter);

@@ -1,5 +1,10 @@
 const express = require('express');
 
+/**
+ * @classdesc Purchases Router
+ * @name RouterPurchases
+ * @class
+ */
 const purchasesRouter = express.Router();
 
 const middleware = require('../middlewares/purchases');
@@ -8,6 +13,9 @@ const { logRequest } = require('../utils/logger');
 
 const controller = require('../controllers/purchases');
 
+/**
+ * @name getAll Get all purchases
+ */
 purchasesRouter.get('/',
   middleware.getAllValidator(),
   middleware.getAllIsValid,
@@ -16,6 +24,10 @@ purchasesRouter.get('/',
     controller.getAllPurchases(req, res, next);
   }));
 
+/**
+ * @name getByCPF Get all purchases by CPF
+ * @param {String} cpf The given document
+ */
 purchasesRouter.get('/cpf/:cpf',
   middleware.cpfValidator(),
   middleware.cpfIsValid,
@@ -26,6 +38,10 @@ purchasesRouter.get('/cpf/:cpf',
     controller.getAllPurchasesByCPF(req, res, next);
   }));
 
+/**
+ * @name getByID Get a purchase by ID
+ * @param {String} id The given identification
+ */
 purchasesRouter.get('/:id',
   middleware.idValidator(),
   middleware.idIsValid,
@@ -34,6 +50,10 @@ purchasesRouter.get('/:id',
     controller.getOnePurchase(req, res, next);
   }));
 
+
+/**
+ * @name create Creates a purchase
+ */
 purchasesRouter.post('/create',
   middleware.oneValidator(),
   middleware.oneIsValid,
@@ -42,6 +62,10 @@ purchasesRouter.post('/create',
     controller.createPurchase(req, res, next);
   }));
 
+/**
+ * @name update Updates purchase with ID
+ * @param {String} id The given identification
+ */
 purchasesRouter.put('/update/:id',
   middleware.idValidator(),
   middleware.idIsValid,
@@ -52,6 +76,10 @@ purchasesRouter.put('/update/:id',
     controller.updatePurchase(req, res, next);
   }));
 
+/**
+ * @name delete Deletes purchase with ID
+ * @param {String} id The given identification
+ */
 purchasesRouter.delete('/delete/:id',
   middleware.idValidator(),
   middleware.idIsValid,

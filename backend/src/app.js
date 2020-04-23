@@ -5,12 +5,13 @@ const middleware = require('./middlewares');
 const events = require('./events/attach');
 const { envs, get, print } = require('./utils/env');
 
+// GET PORT
 const port = get(envs.PORT, 8081);
 
-// LOADED ENV PRINT
+// LOADED ENV
 print();
 
-// DB Setup
+// DB SETUP
 database();
 
 // MIDDLEWARES
