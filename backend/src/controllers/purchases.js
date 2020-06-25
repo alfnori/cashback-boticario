@@ -14,19 +14,32 @@ const Purchases = require('../models/purchases');
 controller.getAllPurchases = (req, res) => {
   const { cpf } = req.query;
   const { role } = req.user;
-  if (role === userRoles.ADMIN) {
-    Purchases.getAllPurchases(req.query,
-      (error, purchases) => jsonResponse(error, { purchases }, res));
-  } else {
-    Purchases.getAllPurchasesByCPF(cpf, req.query,
-      (error, purchases) => jsonResponse(error, { purchases }, res));
+  if (role !== userRoles.ADMIN) {
+    req.query.filter = { ...req.query.filter, cpf };
   }
+  Purchases.getAllPurchases(req.query, (error, purchases) => {
+    if (error) {
+      errorResponse(error, res);
+    } else {
+      Purchases.pagination(req.query, purchases.length, (err, pagination) => {
+        jsonResponse(err, { purchases, pagination }, res);
+      });
+    }
+  });
 };
 
 controller.getAllPurchasesByCPF = (req, res) => {
   const { cpf } = req.params;
-  Purchases.getAllPurchasesByCPF(cpf, req.query,
-    (error, purchases) => jsonResponse(error, { purchases }, res));
+  req.query.filter = { ...req.query.filter, cpf };
+  Purchases.getAllPurchases(req.query, (error, purchases) => {
+    if (error) {
+      errorResponse(error, res);
+    } else {
+      Purchases.pagination(req.query, purchases.length, (err, pagination) => {
+        jsonResponse(err, { purchases, pagination }, res);
+      });
+    }
+  });
 };
 
 controller.getOnePurchase = async (req, res) => {

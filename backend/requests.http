@@ -25,11 +25,11 @@ Authorization: Bearer {{token}}
 ###search=ABC123456N
 ###filter={"date": "2020-04-05T03:00:00.000Z"}
 ###sort={"date": "desc", "value": "desc"}
-GET {{host}}/api/purchases?sort={"date": "asc", "value": "desc"}
+GET {{host}}/api/purchases?sort={"date": "asc", "value": "desc"}&limit=7
 Authorization: Bearer {{specialToken}}
 
 ### Get purchases list by cpf
-GET {{host}}/api/purchases/cpf/{{myCPF2}}?sort={"date":"desc"}
+GET {{host}}/api/purchases/cpf/{{myCPF}}?sort={"date":"desc"}
 Authorization: Bearer {{specialToken}}
 
 ### Get one purchases

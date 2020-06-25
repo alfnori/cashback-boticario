@@ -8,6 +8,10 @@ const {
   validatorCPF, validateCPF, validateCode, messages,
 } = require('../../utils/validators');
 
+/**
+ * Mongo collection Purchases
+ * @constructor PurchasesSchema
+ */
 const PurchasesSchema = new Schema({
   code: {
     type: String,

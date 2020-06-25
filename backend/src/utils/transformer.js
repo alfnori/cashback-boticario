@@ -121,6 +121,30 @@ const transformRequestErrors = (rErrors) => {
   return error;
 };
 
+const paginationData = (count, totalCount, limit, offset) => {
+  const page = offset / limit + 1;
+  const pagination = {
+    count,
+    totalCount,
+    limit,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: {
+      page,
+      itens: count,
+    },
+    nextPage: null,
+  };
+  const next = offset + limit;
+  const diff = totalCount - next;
+  if (diff > 0) {
+    pagination.nextPage = {
+      page: page + 1,
+      itens: diff > limit ? limit : diff,
+    };
+  }
+  return pagination;
+};
+
 module.exports = {
   parseJSON,
   sanitize,
@@ -129,4 +153,5 @@ module.exports = {
   recompileObject,
   transformRequestErrors,
   requestErrors,
+  paginationData,
 };

@@ -1,10 +1,8 @@
-
 const { isEmptyObject } = require('../../utils/checker');
 const { logDatabase } = require('../../utils/logger');
 const {
-  parseJSON, sanitize, transpileObject,
+  parseJSON, sanitize, transpileObject, paginationData,
 } = require('../../utils/transformer');
-
 const { mongooseRegex, mongooseDatex } = require('./index');
 
 const assertFilter = (config) => {
@@ -17,7 +15,7 @@ const assertFilter = (config) => {
       cpf: search,
     };
   } else {
-    filter = parseJSON(config.filter, {});
+    filter = typeof config.filter === 'string' ? parseJSON(config.filter, {}) : config.filter;
   }
   let resultFilter = {};
   if (filter.code) resultFilter.code = mongooseRegex(filter.code);
@@ -60,6 +58,12 @@ const assertOrder = (config) => {
   return resultSort;
 };
 
+const assertPage = (config) => {
+  const page = parseInt(config.page, 10);
+  logDatabase(`PAGE: ${page}`);
+  return page;
+};
+
 const assertLimit = (config) => {
   const limit = parseInt(config.limit, 10);
   logDatabase(`LIMIT: ${limit}`);
@@ -68,7 +72,7 @@ const assertLimit = (config) => {
 
 const assertSkip = (config) => {
   let skip = parseInt(config.skip, 10);
-  const page = parseInt(config.page, 10);
+  const page = assertPage(config);
   if (page > 1) {
     const limit = assertLimit(config);
     skip = (page - 1) * limit;
@@ -77,9 +81,19 @@ const assertSkip = (config) => {
   return skip;
 };
 
+const assertPagination = (count, totalCount, config) => {
+  const limit = assertLimit(config);
+  const offset = assertSkip(config);
+  const pagination = paginationData(count, totalCount, limit, offset);
+  logDatabase(`PAGINATION: ${JSON.stringify(pagination)}`);
+  return pagination;
+};
+
 module.exports = {
   assertFilter,
   assertOrder,
+  assertPage,
   assertLimit,
   assertSkip,
+  assertPagination,
 };

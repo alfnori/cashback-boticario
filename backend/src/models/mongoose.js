@@ -9,6 +9,9 @@ const Status = require('./status');
 const DATABASE_URL = get(envs.DATABASE_URL, '0.0.0.0:27017');
 const DATABASE_NAME = get(envs.DATABASE_NAME, 'cashbackBoticario');
 
+/**
+ * Initialize Database Configuration and Connection
+ */
 const init = () => {
   mongoose.set('useUnifiedTopology', true);
   mongoose.set('useCreateIndex', true);

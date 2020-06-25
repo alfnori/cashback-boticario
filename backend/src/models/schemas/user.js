@@ -12,6 +12,10 @@ const userRoles = {
   USER: 'user',
 };
 
+/**
+ * Mongo collection Users
+ * @constructor UsersSchema
+ */
 const UsersSchema = new Schema({
   name: {
     type: String,

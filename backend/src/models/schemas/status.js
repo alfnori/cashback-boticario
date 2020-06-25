@@ -8,6 +8,10 @@ const statusTags = {
   Aprovado: 'AP',
 };
 
+/**
+ * Mongo collection Status
+ * @constructor StatusSchema
+ */
 const StatusSchema = new Schema({
   name: String,
   order: Number,

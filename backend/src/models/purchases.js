@@ -9,6 +9,30 @@ const { logDatabase, logError } = require('../utils/logger');
 const { isEmptyObject } = require('../utils/checker');
 
 // Methods
+
+/**
+ * Count Documents
+ */
+PurchasesSchema.statics.pagination = function ct(config, pageCount, callback) {
+  logDatabase('QUERY: Executing Count');
+  this.countDocuments(helper.assertFilter(config))
+    .exec((err, totalCount) => {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, helper.assertPagination(pageCount, totalCount, config));
+      }
+    });
+};
+
+/**
+ * List all purchases
+ *
+ * @function getAllPurchases
+ * @param {*} config Query options
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.getAllPurchases = function gap(config, callback) {
   logDatabase('QUERY: Executing findAll');
   this.find(helper.assertFilter(config))
@@ -19,21 +43,44 @@ PurchasesSchema.statics.getAllPurchases = function gap(config, callback) {
     .exec(callback);
 };
 
+/**
+ * List all purchases by CPF
+ *
+ * @function getAllPurchasesByCPF
+ * @param {String} cpf Any CPF
+ * @param {*} config Query options
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.getAllPurchasesByCPF = function gapc(cpf, config, callback) {
   logDatabase(`QUERY: Executing findAll by CPF: ${cpf}`);
-  this.find({ cpf, ...helper.assertFilter(config) })
-    .sort(helper.assertOrder(config))
-    .limit(helper.assertLimit(config))
-    .skip(helper.assertSkip(config))
-    .populate('status')
-    .exec(callback);
+  const onlyByCPF = { ...config };
+  onlyByCPF.filter = { ...config.filter, cpf };
+  this.getAllPurchases(onlyByCPF, callback);
 };
 
+/**
+ * Get an purchase by ID
+ *
+ * @function getOnePurchase
+ * @param {String} id Identification
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.getOnePurchase = function gop(id, callback) {
   logDatabase('QUERY: Executing findOne');
   this.findById(id).populate('status').exec(callback);
 };
 
+/**
+ * Updates an purchase
+ *
+ * @function updatePurchase
+ * @param {String} id Identification
+ * @param {Purchases} data New data
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.updatePurchase = function upd(id, data, callback) {
   logDatabase('MODEL: Executing update');
   let updateData = { ...data };
@@ -70,6 +117,14 @@ PurchasesSchema.statics.updatePurchase = function upd(id, data, callback) {
   });
 };
 
+/**
+ * Creates an purchase
+ *
+ * @function createPurchase
+ * @param {Purchases} data New data
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.createPurchase = function crt(data, callback) {
   logDatabase('MODEL: Executing create');
   this.create(data, async (error, created) => {
@@ -89,11 +144,26 @@ PurchasesSchema.statics.createPurchase = function crt(data, callback) {
   });
 };
 
+/**
+ * Deletes an purchase
+ *
+ * @function deletePurchase
+ * @param {String} id Identification
+ * @param {CallableFunction} callback Callback function for result
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.deletePurchase = function del(id, callback) {
   logDatabase('MODEL: Executing deleteOne');
   this.findByIdAndDelete(id).exec(callback);
 };
 
+/**
+ * Update cashback information to all itens in the list
+ *
+ * @function updateCashbackMultiPurchases
+ * @param {Array<Purchases>} purchases
+ * @memberof PurchasesSchema
+ */
 PurchasesSchema.statics.updateCashbackMultiPurchases = function ucmp(purchases) {
   logDatabase('MODEL: Executing many cashback update');
   if (purchases && purchases.length > 0) {
@@ -121,6 +191,17 @@ PurchasesSchema.statics.updateCashbackMultiPurchases = function ucmp(purchases) 
   }
 };
 
+/**
+ * Get all purchases in a range of dates by CPF
+ *
+ * @function getPurchasesInPeriod
+ * @memberof PurchasesSchema
+ * @param {Date|moment.Moment} startDate Initial Date
+ * @param {Date|moment.Moment} endDate End date
+ * @param {String} cpf User cpf
+ * @param {Object<>} filters Custom filters
+ * @returns {Array<Purchases>} The purchases in period by CPF
+ */
 PurchasesSchema.statics.getPurchasesInPeriod = async function
 gpip(startDate, endDate, cpf = null, filters = {}) {
   logDatabase('MODEL: Get all purchases from day month start to date');
@@ -143,6 +224,15 @@ gpip(startDate, endDate, cpf = null, filters = {}) {
   return purchases;
 };
 
+/**
+ * Get all purchases in a month by CPF
+ *
+ * @function getPurchasesInMonth
+ * @memberof PurchasesSchema
+ * @param {Date|moment.Moment} date Month reference date
+ * @param {String} [cpf=null] User CPF
+ * @returns {Array<Purchases>} The purchases in month by CPF
+ */
 PurchasesSchema.statics.getPurchasesInMonth = async function
 gpin(date, cpf = null) {
   logDatabase('MODEL: Get all purchases from month and status');
@@ -161,5 +251,9 @@ gpin(date, cpf = null) {
   return purchases;
 };
 
+/**
+ * Mongoose Model Purchase
+ * @constructs PurchasesModel
+ */
 const Purchases = mongoose.model('Purchases', PurchasesSchema);
 module.exports = Purchases;
